@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce DZ</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1 id="logoText">E-Commerce DZ</h1>
+                    <img id="logoImage" class="logo-image hidden" alt="Logo">
+                </div>
+                <nav class="nav">
+                    <button class="btn btn--outline btn--sm" id="langToggle">عربي</button>
+                    <button class="btn btn--outline btn--sm" id="cartBtn">
+                        <span data-fr="Panier" data-ar="السلة">Panier</span>
+                        <span class="cart-count">0</span>
+                    </button>
+                    <button class="btn btn--secondary btn--sm" id="adminBtn">
+                        <span data-fr="Admin" data-ar="الإدارة">Admin</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Home Page -->
+        <section id="homePage" class="page active">
+            <div class="container">
+                <div class="hero">
+                    <h2 data-fr="Découvrez nos produits" data-ar="اكتشف منتجاتنا">Découvrez nos produits</h2>
+                    <p data-fr="La meilleure sélection d'électronique en Algérie" data-ar="أفضل مجموعة من الإلكترونيات في الجزائر">La meilleure sélection d'électronique en Algérie</p>
+                </div>
+                <div class="products-grid" id="productsGrid">
+                    <!-- Products will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Detail Page -->
+        <section id="productPage" class="page">
+            <div class="container">
+                <button class="btn btn--outline btn--sm back-btn" id="backToHome">
+                    <span data-fr="← Retour" data-ar="← رجوع">← Retour</span>
+                </button>
+                <div class="product-detail" id="productDetail">
+                    <!-- Product details will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Cart Page -->
+        <section id="cartPage" class="page">
+            <div class="container">
+                <button class="btn btn--outline btn--sm back-btn" id="backFromCart">
+                    <span data-fr="← Retour" data-ar="← رجوع">← Retour</span>
+                </button>
+                <h2 data-fr="Mon Panier" data-ar="سلتي">Mon Panier</h2>
+                <div class="cart-content" id="cartContent">
+                    <!-- Cart items will be loaded dynamically -->
+                </div>
+                <div class="cart-summary" id="cartSummary">
+                    <!-- Cart summary will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Order Form Page -->
+        <section id="orderPage" class="page">
+            <div class="container">
+                <button class="btn btn--outline btn--sm back-btn" id="backFromOrder">
+                    <span data-fr="← Retour" data-ar="← رجوع">← Retour</span>
+                </button>
+                <div class="order-form-container">
+                    <h2 data-fr="Finaliser la commande" data-ar="إنهاء الطلب">Finaliser la commande</h2>
+                    <form id="orderForm" class="order-form">
+                        <div class="form-group">
+                            <label class="form-label" data-fr="Nom" data-ar="الاسم">Nom</label>
+                            <input type="text" class="form-control" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-fr="Prénom" data-ar="اللقب">Prénom</label>
+                            <input type="text" class="form-control" name="lastName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-fr="Numéro de téléphone" data-ar="رقم الهاتف">Numéro de téléphone</label>
+                            <input type="tel" class="form-control" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-fr="Wilaya" data-ar="الولاية">Wilaya</label>
+                            <select class="form-control" name="wilaya" id="wilayaSelect" required>
+                                <option value="" data-fr="Sélectionner une wilaya" data-ar="اختر ولاية">Sélectionner une wilaya</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-fr="Commune" data-ar="البلدية">Commune</label>
+                            <select class="form-control" name="commune" id="communeSelect" required disabled>
+                                <option value="" data-fr="Sélectionner d'abord une wilaya" data-ar="اختر الولاية أولا">Sélectionner d'abord une wilaya</option>
+                            </select>
+                        </div>
+                        <div class="shipping-info" id="shippingInfo">
+                            <!-- Shipping cost will be displayed here -->
+                        </div>
+                        <div class="order-summary" id="orderSummary">
+                            <!-- Order summary will be displayed here -->
+                        </div>
+                        <button type="submit" class="btn btn--primary btn--full-width">
+                            <span data-fr="Valider la commande" data-ar="تأكيد الطلب">Valider la commande</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Panel -->
+        <section id="adminPanel" class="page admin-panel">
+            <div class="admin-header">
+                <div class="container">
+                    <div class="admin-nav">
+                        <h2>Administration</h2>
+                        <nav class="admin-tabs">
+                            <button class="admin-tab active" data-tab="dashboard">Dashboard</button>
+                            <button class="admin-tab" data-tab="orders">Commandes</button>
+                            <button class="admin-tab" data-tab="products">Produits</button>
+                            <button class="admin-tab" data-tab="settings">Paramètres</button>
+                        </nav>
+                        <button class="btn btn--outline btn--sm" id="backToClient">Retour Client</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div id="dashboardTab" class="admin-content active">
+                <div class="container">
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <h3>Chiffre d'affaires</h3>
+                            <div class="stat-value" id="totalRevenue">0 DA</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Commandes totales</h3>
+                            <div class="stat-value" id="totalOrders">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>En attente</h3>
+                            <div class="stat-value" id="pendingOrders">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Confirmées</h3>
+                            <div class="stat-value" id="confirmedOrders">0</div>
+                        </div>
+                    </div>
+                    <div class="dashboard-charts">
+                        <div class="chart-container" style="position: relative; height: 400px;">
+                            <h3>Évolution du chiffre d'affaires</h3>
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 400px;">
+                            <h3>Commandes par statut</h3>
+                            <canvas id="ordersChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Tab -->
+            <div id="ordersTab" class="admin-content">
+                <div class="container">
+                    <div class="orders-header">
+                        <h3>Gestion des commandes</h3>
+                        <div class="orders-filters">
+                            <select id="statusFilter" class="form-control">
+                                <option value="">Tous les statuts</option>
+                                <option value="en attente">En attente</option>
+                                <option value="confirmée">Confirmée</option>
+                                <option value="expédiée">Expédiée</option>
+                                <option value="livrée">Livrée</option>
+                                <option value="annulée">Annulée</option>
+                                <option value="retour">Retour</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="orders-table" id="ordersTable">
+                        <!-- Orders will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Tab -->
+            <div id="productsTab" class="admin-content">
+                <div class="container">
+                    <div class="products-header">
+                        <h3>Gestion des produits</h3>
+                        <button class="btn btn--primary" id="addProductBtn">Ajouter un produit</button>
+                    </div>
+                    <div class="products-table" id="productsTable">
+                        <!-- Products will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settingsTab" class="admin-content">
+                <div class="container">
+                    <div class="settings-sections">
+                        <!-- Logo Settings -->
+                        <div class="settings-section">
+                            <h3>Gestion du logo</h3>
+                            <div class="logo-settings">
+                                <div class="logo-upload-area" id="logoUploadArea">
+                                    <div class="upload-content">
+                                        <div class="upload-icon">📁</div>
+                                        <p>Glissez-déposez votre logo ici ou cliquez pour sélectionner</p>
+                                        <p class="upload-hint">PNG, JPG, JPEG, SVG (max 2MB)</p>
+                                        <input type="file" id="logoInput" accept=".png,.jpg,.jpeg,.svg" class="hidden">
+                                    </div>
+                                </div>
+                                <div class="logo-preview" id="logoPreview">
+                                    <h4>Aperçu :</h4>
+                                    <div class="preview-container">
+                                        <div class="preview-logo">
+                                            <h1 id="previewLogoText">E-Commerce DZ</h1>
+                                            <img id="previewLogoImage" class="logo-image hidden" alt="Aperçu logo">
+                                        </div>
+                                    </div>
+                                    <div class="logo-actions">
+                                        <button class="btn btn--primary" id="saveLogo" disabled>Sauvegarder</button>
+                                        <button class="btn btn--outline" id="resetLogo">Restaurer par défaut</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Settings -->
+                        <div class="settings-section">
+                            <h3>Paramètres de livraison</h3>
+                            <div class="shipping-settings" id="shippingSettings">
+                                <!-- Shipping settings will be loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Order Confirmation Modal -->
+    <div id="orderModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-fr="Commande confirmée!" data-ar="!تم تأكيد الطلب">Commande confirmée!</h3>
+            </div>
+            <div class="modal-body">
+                <p data-fr="Votre commande a été enregistrée avec succès." data-ar="تم تسجيل طلبك بنجاح.">Votre commande a été enregistrée avec succès.</p>
+                <div id="orderDetails"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--primary" id="closeOrderModal">
+                    <span data-fr="Fermer" data-ar="إغلاق">Fermer</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Form Modal -->
+    <div id="productModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="productModalTitle">Ajouter un produit</h3>
+                <button class="modal-close" id="closeProductModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm">
+                    <div class="form-group">
+                        <label class="form-label">Nom (Français)</label>
+                        <input type="text" class="form-control" name="name_fr" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nom (Arabe)</label>
+                        <input type="text" class="form-control" name="name_ar" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Prix (DA)</label>
+                        <input type="number" class="form-control" name="price" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Réduction (%)</label>
+                        <input type="number" class="form-control" name="discount" min="0" max="100" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Catégorie</label>
+                        <input type="text" class="form-control" name="category" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description (Français)</label>
+                        <textarea class="form-control" name="description_fr" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description (Arabe)</label>
+                        <textarea class="form-control" name="description_ar" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Stock</label>
+                        <input type="number" class="form-control" name="stock" required>
+                    </div>
+                    
+                    <!-- Colors Section -->
+                    <div class="form-group">
+                        <label class="form-label">Couleurs disponibles</label>
+                        <div id="colorsContainer">
+                            <div class="color-item">
+                                <div class="color-inputs">
+                                    <input type="text" placeholder="Nom français" name="color_name_fr[]" class="form-control color-name">
+                                    <input type="text" placeholder="Nom arabe" name="color_name_ar[]" class="form-control color-name">
+                                    <input type="color" name="color_hex[]" class="form-control color-picker" value="#000000">
+                                    <input type="number" placeholder="Stock" name="color_stock[]" class="form-control color-stock" min="0" value="0">
+                                    <input type="number" placeholder="Ajustement prix" name="color_price_adj[]" class="form-control color-price" value="0">
+                                    <button type="button" class="btn btn--outline btn--sm remove-color">×</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn--outline btn--sm" id="addColorBtn">Ajouter une couleur</button>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn--outline" id="cancelProductForm">Annuler</button>
+                        <button type="submit" class="btn btn--primary">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Color Selection Modal -->
+    <div id="colorModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-fr="Sélectionner une couleur" data-ar="اختر لون">Sélectionner une couleur</h3>
+                <button class="modal-close" id="closeColorModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p data-fr="Veuillez sélectionner une couleur avant de continuer" data-ar="يرجى اختيار لون قبل المتابعة">Veuillez sélectionner une couleur avant de continuer</p>
+                <div id="colorOptions" class="color-options">
+                    <!-- Color options will be loaded dynamically -->
+                </div>
+                <div class="selected-color-info" id="selectedColorInfo" style="display: none;">
+                    <h4 data-fr="Couleur sélectionnée:" data-ar="اللون المختار:">Couleur sélectionnée:</h4>
+                    <div class="color-display">
+                        <div class="color-circle" id="selectedColorCircle"></div>
+                        <span id="selectedColorName"></span>
+                    </div>
+                    <div class="color-price" id="selectedColorPrice"></div>
+                    <div class="color-stock" id="selectedColorStock"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--outline" id="cancelColorSelection">
+                    <span data-fr="Annuler" data-ar="إلغاء">Annuler</span>
+                </button>
+                <button class="btn btn--primary" id="confirmColorSelection" disabled>
+                    <span data-fr="Confirmer" data-ar="تأكيد">Confirmer</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
