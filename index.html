@@ -7,6 +7,32 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+<script> // Ta configuration copiée à l'étape précédente
+  const firebaseConfig = { ... };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyC0mgJ-YPAypFskLmfkNu5j8mEDql2uExU",
+  authDomain: "e-commerce-dz-dbe50.firebaseapp.com",
+  projectId: "e-commerce-dz-dbe50",
+  storageBucket: "e-commerce-dz-dbe50.firebasestorage.app",
+  messagingSenderId: "403766810136",
+  appId: "1:403766810136:web:59deaf0afcb2565f5cd56d",
+  measurementId: "G-NV06JQ4HD2"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 <body>
     <!-- Header -->
     <header class="header">
