@@ -1406,7 +1406,25 @@ document.addEventListener('DOMContentLoaded', function() {
       renderOrdersTable();
     });
   }
-  
+  document.getElementById("orderForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+  const nom = document.getElementById('nom').value;
+  const tel = document.getElementById('tel').value;
+  // Ajoute ici wilaya, commune, panier…
+  const commande = {
+    nom, tel,
+    date: new Date().toISOString()
+    // autres infos
+  };
+  try {
+    await db.collection("commandes").add(commande);
+    alert("Commande enregistrée !");
+    e.target.reset();
+  } catch(err) {
+    alert("Erreur d'enregistrement : " + err.message);
+  }
+});
+
   // Initialize the application
   renderHomePage();
   updateLanguageDisplay();
