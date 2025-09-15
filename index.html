@@ -1,403 +1,416 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Commerce DZ</title>
+    <title>BazarDZ - Boutique en ligne</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;550;600&display=swap" rel="stylesheet">
 </head>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-<script> // Ta configuration copiée à l'étape précédente
-  const firebaseConfig = { ... };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-</script import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyC0mgJ-YPAypFskLmfkNu5j8mEDql2uExU",
-  authDomain: "e-commerce-dz-dbe50.firebaseapp.com",
-  projectId: "e-commerce-dz-dbe50",
-  storageBucket: "e-commerce-dz-dbe50.firebasestorage.app",
-  messagingSenderId: "403766810136",
-  appId: "1:403766810136:web:59deaf0afcb2565f5cd56d",
-  measurementId: "G-NV06JQ4HD2"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 <body>
-    <!-- Header -->
-    <header class="header">
+    <!-- Loading Overlay -->
+    <div id="loading" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Navigation Header -->
+    <header id="header" class="header">
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <h1 id="logoText">E-Commerce DZ</h1>
-                    <img id="logoImage" class="logo-image hidden" alt="Logo">
+                    <img id="logo-img" src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200" alt="Logo" class="logo-img">
+                    <span class="logo-text" data-fr="BazarDZ" data-ar="بازار الجزائر">BazarDZ</span>
                 </div>
+                
                 <nav class="nav">
-                    <button class="btn btn--outline btn--sm" id="langToggle">عربي</button>
-                    <button class="btn btn--outline btn--sm" id="cartBtn">
-                        <span data-fr="Panier" data-ar="السلة">Panier</span>
-                        <span class="cart-count">0</span>
-                    </button>
-                    <button class="btn btn--secondary btn--sm" id="adminBtn">
-                        <span data-fr="Admin" data-ar="الإدارة">Admin</span>
-                    </button>
+                    <button class="nav-btn active" data-page="home" data-fr="Accueil" data-ar="الرئيسية">Accueil</button>
+                    <button class="nav-btn" data-page="cart" data-fr="Panier" data-ar="العربة">Panier (<span id="cart-count">0</span>)</button>
                 </nav>
+                
+                <div class="header-actions">
+                    <select id="language-select" class="form-control lang-select">
+                        <option value="fr">Français</option>
+                        <option value="ar">العربية</option>
+                    </select>
+                    <button id="admin-btn" class="btn btn--secondary" data-fr="Admin" data-ar="إدارة">Admin</button>
+                </div>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="main">
+    <main id="main-content" class="main-content">
+        
         <!-- Home Page -->
-        <section id="homePage" class="page active">
+        <div id="home-page" class="page active">
             <div class="container">
-                <div class="hero">
-                    <h2 data-fr="Découvrez nos produits" data-ar="اكتشف منتجاتنا">Découvrez nos produits</h2>
-                    <p data-fr="La meilleure sélection d'électronique en Algérie" data-ar="أفضل مجموعة من الإلكترونيات في الجزائر">La meilleure sélection d'électronique en Algérie</p>
-                </div>
-                <div class="products-grid" id="productsGrid">
-                    <!-- Products will be loaded dynamically -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Product Detail Page -->
-        <section id="productPage" class="page">
-            <div class="container">
-                <button class="btn btn--outline btn--sm back-btn" id="backToHome">
-                    <span data-fr="← Retour" data-ar="← رجوع">← Retour</span>
-                </button>
-                <div class="product-detail" id="productDetail">
-                    <!-- Product details will be loaded dynamically -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Cart Page -->
-        <section id="cartPage" class="page">
-            <div class="container">
-                <button class="btn btn--outline btn--sm back-btn" id="backFromCart">
-                    <span data-fr="← Retour" data-ar="← رجوع">← Retour</span>
-                </button>
-                <h2 data-fr="Mon Panier" data-ar="سلتي">Mon Panier</h2>
-                <div class="cart-content" id="cartContent">
-                    <!-- Cart items will be loaded dynamically -->
-                </div>
-                <div class="cart-summary" id="cartSummary">
-                    <!-- Cart summary will be loaded dynamically -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Order Form Page -->
-        <section id="orderPage" class="page">
-            <div class="container">
-                <button class="btn btn--outline btn--sm back-btn" id="backFromOrder">
-                    <span data-fr="← Retour" data-ar="← رجوع">← Retour</span>
-                </button>
-                <div class="order-form-container">
-                    <h2 data-fr="Finaliser la commande" data-ar="إنهاء الطلب">Finaliser la commande</h2>
-                    <form id="orderForm" class="order-form">
-                        <div class="form-group">
-                            <label class="form-label" data-fr="Nom" data-ar="الاسم">Nom</label>
-                            <input type="text" class="form-control" name="firstName" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" data-fr="Prénom" data-ar="اللقب">Prénom</label>
-                            <input type="text" class="form-control" name="lastName" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" data-fr="Numéro de téléphone" data-ar="رقم الهاتف">Numéro de téléphone</label>
-                            <input type="tel" class="form-control" name="phone" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" data-fr="Wilaya" data-ar="الولاية">Wilaya</label>
-                            <select class="form-control" name="wilaya" id="wilayaSelect" required>
-                                <option value="" data-fr="Sélectionner une wilaya" data-ar="اختر ولاية">Sélectionner une wilaya</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" data-fr="Commune" data-ar="البلدية">Commune</label>
-                            <select class="form-control" name="commune" id="communeSelect" required disabled>
-                                <option value="" data-fr="Sélectionner d'abord une wilaya" data-ar="اختر الولاية أولا">Sélectionner d'abord une wilaya</option>
-                            </select>
-                        </div>
-                        <div class="shipping-info" id="shippingInfo">
-                            <!-- Shipping cost will be displayed here -->
-                        </div>
-                        <div class="order-summary" id="orderSummary">
-                            <!-- Order summary will be displayed here -->
-                        </div>
-                        <button type="submit" class="btn btn--primary btn--full-width">
-                            <span data-fr="Valider la commande" data-ar="تأكيد الطلب">Valider la commande</span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <!-- Admin Panel -->
-        <section id="adminPanel" class="page admin-panel">
-            <div class="admin-header">
-                <div class="container">
-                    <div class="admin-nav">
-                        <h2>Administration</h2>
-                        <nav class="admin-tabs">
-                            <button class="admin-tab active" data-tab="dashboard">Dashboard</button>
-                            <button class="admin-tab" data-tab="orders">Commandes</button>
-                            <button class="admin-tab" data-tab="products">Produits</button>
-                            <button class="admin-tab" data-tab="settings">Paramètres</button>
-                        </nav>
-                        <button class="btn btn--outline btn--sm" id="backToClient">Retour Client</button>
+                <div class="hero-section">
+                    <h1 class="hero-title" data-fr="Bienvenue sur BazarDZ" data-ar="مرحباً بكم في بازار الجزائر">Bienvenue sur BazarDZ</h1>
+                    <p class="hero-subtitle" data-fr="Découvrez nos produits de qualité avec livraison dans toute l'Algérie" data-ar="اكتشفوا منتجاتنا عالية الجودة مع التوصيل في جميع أنحاء الجزائر">Découvrez nos produits de qualité avec livraison dans toute l'Algérie</p>
+                    
+                    <div class="search-section">
+                        <input type="text" id="search-input" class="form-control search-input" data-fr="Rechercher un produit..." data-ar="البحث عن منتج..." placeholder="Rechercher un produit...">
                     </div>
                 </div>
-            </div>
-
-            <!-- Dashboard Tab -->
-            <div id="dashboardTab" class="admin-content active">
-                <div class="container">
-                    <div class="dashboard-stats">
-                        <div class="stat-card">
-                            <h3>Chiffre d'affaires</h3>
-                            <div class="stat-value" id="totalRevenue">0 DA</div>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Commandes totales</h3>
-                            <div class="stat-value" id="totalOrders">0</div>
-                        </div>
-                        <div class="stat-card">
-                            <h3>En attente</h3>
-                            <div class="stat-value" id="pendingOrders">0</div>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Confirmées</h3>
-                            <div class="stat-value" id="confirmedOrders">0</div>
-                        </div>
-                    </div>
-                    <div class="dashboard-charts">
-                        <div class="chart-container" style="position: relative; height: 400px;">
-                            <h3>Évolution du chiffre d'affaires</h3>
-                            <canvas id="revenueChart"></canvas>
-                        </div>
-                        <div class="chart-container" style="position: relative; height: 400px;">
-                            <h3>Commandes par statut</h3>
-                            <canvas id="ordersChart"></canvas>
-                        </div>
-                    </div>
+                
+                <div class="products-grid" id="products-grid">
+                    <!-- Products will be populated by JavaScript -->
                 </div>
-            </div>
-
-            <!-- Orders Tab -->
-            <div id="ordersTab" class="admin-content">
-                <div class="container">
-                    <div class="orders-header">
-                        <h3>Gestion des commandes</h3>
-                        <div class="orders-filters">
-                            <select id="statusFilter" class="form-control">
-                                <option value="">Tous les statuts</option>
-                                <option value="en attente">En attente</option>
-                                <option value="confirmée">Confirmée</option>
-                                <option value="expédiée">Expédiée</option>
-                                <option value="livrée">Livrée</option>
-                                <option value="annulée">Annulée</option>
-                                <option value="retour">Retour</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="orders-table" id="ordersTable">
-                        <!-- Orders will be loaded dynamically -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Products Tab -->
-            <div id="productsTab" class="admin-content">
-                <div class="container">
-                    <div class="products-header">
-                        <h3>Gestion des produits</h3>
-                        <button class="btn btn--primary" id="addProductBtn">Ajouter un produit</button>
-                    </div>
-                    <div class="products-table" id="productsTable">
-                        <!-- Products will be loaded dynamically -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings Tab -->
-            <div id="settingsTab" class="admin-content">
-                <div class="container">
-                    <div class="settings-sections">
-                        <!-- Logo Settings -->
-                        <div class="settings-section">
-                            <h3>Gestion du logo</h3>
-                            <div class="logo-settings">
-                                <div class="logo-upload-area" id="logoUploadArea">
-                                    <div class="upload-content">
-                                        <div class="upload-icon">📁</div>
-                                        <p>Glissez-déposez votre logo ici ou cliquez pour sélectionner</p>
-                                        <p class="upload-hint">PNG, JPG, JPEG, SVG (max 2MB)</p>
-                                        <input type="file" id="logoInput" accept=".png,.jpg,.jpeg,.svg" class="hidden">
-                                    </div>
-                                </div>
-                                <div class="logo-preview" id="logoPreview">
-                                    <h4>Aperçu :</h4>
-                                    <div class="preview-container">
-                                        <div class="preview-logo">
-                                            <h1 id="previewLogoText">E-Commerce DZ</h1>
-                                            <img id="previewLogoImage" class="logo-image hidden" alt="Aperçu logo">
-                                        </div>
-                                    </div>
-                                    <div class="logo-actions">
-                                        <button class="btn btn--primary" id="saveLogo" disabled>Sauvegarder</button>
-                                        <button class="btn btn--outline" id="resetLogo">Restaurer par défaut</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Shipping Settings -->
-                        <div class="settings-section">
-                            <h3>Paramètres de livraison</h3>
-                            <div class="shipping-settings" id="shippingSettings">
-                                <!-- Shipping settings will be loaded dynamically -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Order Confirmation Modal -->
-    <div id="orderModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 data-fr="Commande confirmée!" data-ar="!تم تأكيد الطلب">Commande confirmée!</h3>
-            </div>
-            <div class="modal-body">
-                <p data-fr="Votre commande a été enregistrée avec succès." data-ar="تم تسجيل طلبك بنجاح.">Votre commande a été enregistrée avec succès.</p>
-                <div id="orderDetails"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn--primary" id="closeOrderModal">
-                    <span data-fr="Fermer" data-ar="إغلاق">Fermer</span>
-                </button>
             </div>
         </div>
-    </div>
 
-    <!-- Product Form Modal -->
-    <div id="productModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="productModalTitle">Ajouter un produit</h3>
-                <button class="modal-close" id="closeProductModal">&times;</button>
+        <!-- Product Detail Page -->
+        <div id="product-page" class="page">
+            <div class="container">
+                <button id="back-to-home" class="btn btn--outline back-btn" data-fr="← Retour" data-ar="← رجوع">← Retour</button>
+                <div id="product-detail" class="product-detail">
+                    <!-- Product details will be populated by JavaScript -->
+                </div>
             </div>
-            <div class="modal-body">
-                <form id="productForm">
-                    <div class="form-group">
-                        <label class="form-label">Nom (Français)</label>
-                        <input type="text" class="form-control" name="name_fr" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Nom (Arabe)</label>
-                        <input type="text" class="form-control" name="name_ar" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Prix (DA)</label>
-                        <input type="number" class="form-control" name="price" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Réduction (%)</label>
-                        <input type="number" class="form-control" name="discount" min="0" max="100" value="0">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Catégorie</label>
-                        <input type="text" class="form-control" name="category" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Description (Français)</label>
-                        <textarea class="form-control" name="description_fr" rows="3" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Description (Arabe)</label>
-                        <textarea class="form-control" name="description_ar" rows="3" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Stock</label>
-                        <input type="number" class="form-control" name="stock" required>
-                    </div>
-                    
-                    <!-- Colors Section -->
-                    <div class="form-group">
-                        <label class="form-label">Couleurs disponibles</label>
-                        <div id="colorsContainer">
-                            <div class="color-item">
-                                <div class="color-inputs">
-                                    <input type="text" placeholder="Nom français" name="color_name_fr[]" class="form-control color-name">
-                                    <input type="text" placeholder="Nom arabe" name="color_name_ar[]" class="form-control color-name">
-                                    <input type="color" name="color_hex[]" class="form-control color-picker" value="#000000">
-                                    <input type="number" placeholder="Stock" name="color_stock[]" class="form-control color-stock" min="0" value="0">
-                                    <input type="number" placeholder="Ajustement prix" name="color_price_adj[]" class="form-control color-price" value="0">
-                                    <button type="button" class="btn btn--outline btn--sm remove-color">×</button>
+        </div>
+
+        <!-- Cart Page -->
+        <div id="cart-page" class="page">
+            <div class="container">
+                <button id="back-to-home-cart" class="btn btn--outline back-btn" data-fr="← Continuer mes achats" data-ar="← متابعة التسوق">← Continuer mes achats</button>
+                <h2 class="page-title" data-fr="Mon Panier" data-ar="عربة التسوق">Mon Panier</h2>
+                <div id="cart-content" class="cart-content">
+                    <!-- Cart content will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkout Page -->
+        <div id="checkout-page" class="page">
+            <div class="container">
+                <button class="btn btn--outline back-btn mb-24" onclick="navigateToPage('cart')" data-fr="← Retour au panier" data-ar="← العودة للعربة">← Retour au panier</button>
+                <h2 class="page-title" data-fr="Finaliser la commande" data-ar="إتمام الطلب">Finaliser la commande</h2>
+                <form id="checkout-form" class="checkout-form">
+                    <div class="checkout-grid">
+                        <div class="checkout-left">
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3 data-fr="Informations de livraison" data-ar="معلومات التوصيل">Informations de livraison</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="form-group">
+                                        <label class="form-label" data-fr="Nom complet" data-ar="الاسم الكامل">Nom complet *</label>
+                                        <input type="text" id="customer-name" class="form-control" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" data-fr="Numéro de téléphone" data-ar="رقم الهاتف">Numéro de téléphone *</label>
+                                        <input type="tel" id="customer-phone" class="form-control" placeholder="05XX XX XX XX" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" data-fr="Adresse de livraison" data-ar="عنوان التوصيل">Adresse de livraison *</label>
+                                        <textarea id="customer-address" class="form-control" rows="3" placeholder="Votre adresse complète..." required></textarea>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label" data-fr="Wilaya" data-ar="الولاية">Wilaya *</label>
+                                            <select id="wilaya-select" class="form-control" required>
+                                                <option value="" data-fr="Sélectionner une wilaya" data-ar="اختر الولاية">Sélectionner une wilaya</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label" data-fr="Commune" data-ar="البلدية">Commune *</label>
+                                            <select id="commune-select" class="form-control" required disabled>
+                                                <option value="" data-fr="Sélectionner une commune" data-ar="اختر البلدية">Sélectionner une commune</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <button type="button" class="btn btn--outline btn--sm" id="addColorBtn">Ajouter une couleur</button>
-                    </div>
-                    
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn--outline" id="cancelProductForm">Annuler</button>
-                        <button type="submit" class="btn btn--primary">Enregistrer</button>
+                        
+                        <div class="checkout-right">
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3 data-fr="Résumé de la commande" data-ar="ملخص الطلب">Résumé de la commande</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div id="order-summary" class="order-summary">
+                                        <!-- Order summary will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                                <div class="card__footer">
+                                    <button type="submit" id="submit-order-btn" class="btn btn--primary btn--full-width" data-fr="Confirmer la commande" data-ar="تأكيد الطلب">Confirmer la commande</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
-    </div>
 
-    <!-- Color Selection Modal -->
-    <div id="colorModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 data-fr="Sélectionner une couleur" data-ar="اختر لون">Sélectionner une couleur</h3>
-                <button class="modal-close" id="closeColorModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p data-fr="Veuillez sélectionner une couleur avant de continuer" data-ar="يرجى اختيار لون قبل المتابعة">Veuillez sélectionner une couleur avant de continuer</p>
-                <div id="colorOptions" class="color-options">
-                    <!-- Color options will be loaded dynamically -->
-                </div>
-                <div class="selected-color-info" id="selectedColorInfo" style="display: none;">
-                    <h4 data-fr="Couleur sélectionnée:" data-ar="اللون المختار:">Couleur sélectionnée:</h4>
-                    <div class="color-display">
-                        <div class="color-circle" id="selectedColorCircle"></div>
-                        <span id="selectedColorName"></span>
+        <!-- Order Confirmation Page -->
+        <div id="confirmation-page" class="page">
+            <div class="container">
+                <div class="confirmation-content">
+                    <div class="confirmation-icon">✅</div>
+                    <h2 data-fr="Commande confirmée !" data-ar="تم تأكيد الطلب!">Commande confirmée !</h2>
+                    <p data-fr="Votre commande a été enregistrée avec succès. Vous serez contacté prochainement." data-ar="تم تسجيل طلبكم بنجاح. سيتم الاتصال بكم قريباً.">Votre commande a été enregistrée avec succès. Vous serez contacté prochainement.</p>
+                    <div id="order-details" class="order-details">
+                        <!-- Order details will be populated -->
                     </div>
-                    <div class="color-price" id="selectedColorPrice"></div>
-                    <div class="color-stock" id="selectedColorStock"></div>
+                    <button id="new-order-btn" class="btn btn--primary" data-fr="Nouvelle commande" data-ar="طلب جديد">Nouvelle commande</button>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn--outline" id="cancelColorSelection">
-                    <span data-fr="Annuler" data-ar="إلغاء">Annuler</span>
-                </button>
-                <button class="btn btn--primary" id="confirmColorSelection" disabled>
-                    <span data-fr="Confirmer" data-ar="تأكيد">Confirmer</span>
-                </button>
+        </div>
+
+        <!-- Admin Login Page -->
+        <div id="admin-login-page" class="page">
+            <div class="container">
+                <button class="btn btn--outline back-btn mb-24" onclick="navigateToPage('home')" data-fr="← Retour à l'accueil" data-ar="← العودة للرئيسية">← Retour à l'accueil</button>
+                <div class="login-container">
+                    <div class="card">
+                        <div class="card__header">
+                            <h2 data-fr="Accès Administrateur" data-ar="وصول المسؤول">Accès Administrateur</h2>
+                        </div>
+                        <div class="card__body">
+                            <form id="admin-login-form">
+                                <div class="form-group">
+                                    <label class="form-label" data-fr="Code d'accès" data-ar="رمز الوصول">Code d'accès</label>
+                                    <input type="password" id="admin-code" class="form-control" placeholder="Saisissez votre code..." required>
+                                </div>
+                                <button type="submit" class="btn btn--primary btn--full-width" data-fr="Se connecter" data-ar="تسجيل الدخول">Se connecter</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="admin-dashboard-page" class="page admin-page">
+            <div class="container">
+                <div class="admin-header">
+                    <h1 data-fr="Tableau de bord administrateur" data-ar="لوحة تحكم المسؤول">Tableau de bord administrateur</h1>
+                    <div class="admin-nav">
+                        <button class="btn btn--secondary admin-nav-btn active" data-section="dashboard" data-fr="Statistiques" data-ar="إحصائيات">Statistiques</button>
+                        <button class="btn btn--secondary admin-nav-btn" data-section="orders" data-fr="Commandes" data-ar="الطلبات">Commandes</button>
+                        <button class="btn btn--secondary admin-nav-btn" data-section="products" data-fr="Produits" data-ar="المنتجات">Produits</button>
+                        <button class="btn btn--secondary admin-nav-btn" data-section="geography" data-fr="Géographie" data-ar="الجغرافيا">Géographie</button>
+                        <button class="btn btn--secondary admin-nav-btn" data-section="settings" data-fr="Paramètres" data-ar="الإعدادات">Paramètres</button>
+                        <button id="admin-logout" class="btn btn--outline" data-fr="Déconnexion" data-ar="تسجيل الخروج">Déconnexion</button>
+                    </div>
+                </div>
+
+                <!-- Dashboard Stats -->
+                <div id="admin-dashboard-content" class="admin-section active">
+                    <div class="stats-grid">
+                        <div class="card stat-card">
+                            <div class="card__body">
+                                <div class="stat-icon">💰</div>
+                                <div class="stat-content">
+                                    <div class="stat-value" id="total-revenue">0 DA</div>
+                                    <div class="stat-label" data-fr="Chiffre d'affaires" data-ar="رقم الأعمال">Chiffre d'affaires</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card stat-card">
+                            <div class="card__body">
+                                <div class="stat-icon">📦</div>
+                                <div class="stat-content">
+                                    <div class="stat-value" id="total-orders">0</div>
+                                    <div class="stat-label" data-fr="Total commandes" data-ar="إجمالي الطلبات">Total commandes</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card stat-card">
+                            <div class="card__body">
+                                <div class="stat-icon">⏳</div>
+                                <div class="stat-content">
+                                    <div class="stat-value" id="pending-orders">0</div>
+                                    <div class="stat-label" data-fr="En attente" data-ar="في الانتظار">En attente</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card stat-card">
+                            <div class="card__body">
+                                <div class="stat-icon">🚛</div>
+                                <div class="stat-content">
+                                    <div class="stat-value" id="shipped-orders">0</div>
+                                    <div class="stat-label" data-fr="Expédiées" data-ar="مُرسلة">Expédiées</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-section">
+                        <div class="card">
+                            <div class="card__header">
+                                <h3 data-fr="Répartition des commandes par statut" data-ar="توزيع الطلبات حسب الحالة">Répartition des commandes par statut</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="chart-container" style="position: relative; height: 300px;">
+                                    <canvas id="orders-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Management -->
+                <div id="admin-orders-content" class="admin-section">
+                    <div class="admin-section-header">
+                        <h2 data-fr="Gestion des commandes" data-ar="إدارة الطلبات">Gestion des commandes</h2>
+                        <div class="admin-filters">
+                            <input type="text" id="orders-search" class="form-control" data-fr="Rechercher..." data-ar="بحث..." placeholder="Rechercher...">
+                            <select id="status-filter" class="form-control">
+                                <option value="" data-fr="Tous les statuts" data-ar="جميع الحالات">Tous les statuts</option>
+                                <option value="En attente">En attente</option>
+                                <option value="Confirmée">Confirmée</option>
+                                <option value="Expédiée">Expédiée</option>
+                                <option value="Livrée">Livrée</option>
+                                <option value="Annulée">Annulée</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="orders-table" class="data-table-container">
+                        <!-- Orders table will be populated -->
+                    </div>
+                </div>
+
+                <!-- Products Management -->
+                <div id="admin-products-content" class="admin-section">
+                    <div class="admin-section-header">
+                        <h2 data-fr="Gestion des produits" data-ar="إدارة المنتجات">Gestion des produits</h2>
+                        <button id="add-product-btn" class="btn btn--primary" data-fr="Ajouter un produit" data-ar="إضافة منتج">Ajouter un produit</button>
+                    </div>
+                    <div id="products-table" class="data-table-container">
+                        <!-- Products table will be populated -->
+                    </div>
+                </div>
+
+                <!-- Geography Management -->
+                <div id="admin-geography-content" class="admin-section">
+                    <div class="admin-section-header">
+                        <h2 data-fr="Gestion des wilayas et frais de livraison" data-ar="إدارة الولايات ورسوم التوصيل">Gestion des wilayas et frais de livraison</h2>
+                        <button id="add-wilaya-btn" class="btn btn--primary" data-fr="Ajouter une wilaya" data-ar="إضافة ولاية">Ajouter une wilaya</button>
+                    </div>
+                    <div id="geography-table" class="data-table-container">
+                        <!-- Geography table will be populated -->
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div id="admin-settings-content" class="admin-section">
+                    <div class="admin-section-header">
+                        <h2 data-fr="Paramètres de l'application" data-ar="إعدادات التطبيق">Paramètres de l'application</h2>
+                    </div>
+                    <div class="settings-grid">
+                        <!-- Logo Settings -->
+                        <div class="card">
+                            <div class="card__header">
+                                <h3 data-fr="Gestion du logo" data-ar="إدارة الشعار">Gestion du logo</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="logo-preview-section">
+                                    <div class="logo-current">
+                                        <label class="form-label" data-fr="Logo actuel" data-ar="الشعار الحالي">Logo actuel</label>
+                                        <div class="logo-preview">
+                                            <img id="current-logo-preview" src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200" alt="Logo actuel">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="logo-upload-section">
+                                        <label class="form-label" data-fr="Changer le logo" data-ar="تغيير الشعار">Changer le logo</label>
+                                        <div class="upload-zone" id="logo-upload-zone">
+                                            <div class="upload-placeholder">
+                                                <div class="upload-icon">📁</div>
+                                                <p data-fr="Cliquez ou glissez votre logo ici" data-ar="انقر أو اسحب الشعار هنا">Cliquez ou glissez votre logo ici</p>
+                                                <p><small>JPG, PNG, max 2MB</small></p>
+                                            </div>
+                                            <input type="file" id="logo-file-input" accept="image/*" style="display: none;">
+                                            <div id="logo-new-preview" class="new-logo-preview hidden">
+                                                <img id="new-logo-img" alt="Nouveau logo">
+                                                <div class="logo-actions">
+                                                    <button type="button" class="btn btn--primary" onclick="saveLogo()" data-fr="Sauvegarder" data-ar="حفظ">Sauvegarder</button>
+                                                    <button type="button" class="btn btn--outline" onclick="cancelLogoUpload()" data-fr="Annuler" data-ar="إلغاء">Annuler</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn--outline mt-16" onclick="resetToDefaultLogo()" data-fr="Logo par défaut" data-ar="الشعار الافتراضي">Logo par défaut</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- General Settings -->
+                        <div class="card">
+                            <div class="card__header">
+                                <h3 data-fr="Informations générales" data-ar="المعلومات العامة">Informations générales</h3>
+                            </div>
+                            <div class="card__body">
+                                <form id="settings-form">
+                                    <div class="form-group">
+                                        <label class="form-label" data-fr="Nom de l'application (FR)" data-ar="اسم التطبيق (فر)">Nom de l'application (FR)</label>
+                                        <input type="text" id="app-name-fr" class="form-control" value="BazarDZ">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" data-fr="Nom de l'application (AR)" data-ar="اسم التطبيق (عر)">Nom de l'application (AR)</label>
+                                        <input type="text" id="app-name-ar" class="form-control" value="بازار الجزائر">
+                                    </div>
+                                    <button type="submit" class="btn btn--primary" data-fr="Enregistrer" data-ar="حفظ">Enregistrer</button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Access Codes -->
+                        <div class="card">
+                            <div class="card__header">
+                                <h3 data-fr="Changer les codes d'accès" data-ar="تغيير رموز الوصول">Changer les codes d'accès</h3>
+                            </div>
+                            <div class="card__body">
+                                <form id="password-form">
+                                    <div class="form-group">
+                                        <label class="form-label" data-fr="Nouveau code principal" data-ar="الرمز الأساسي الجديد">Nouveau code principal</label>
+                                        <input type="password" id="new-main-code" class="form-control" placeholder="Nouveau code...">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" data-fr="Nouveau code de secours" data-ar="رمز الطوارئ الجديد">Nouveau code de secours</label>
+                                        <input type="password" id="new-backup-code" class="form-control" placeholder="Code de secours...">
+                                    </div>
+                                    <button type="submit" class="btn btn--primary" data-fr="Changer les codes" data-ar="تغيير الرموز">Changer les codes</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Modal Title</h3>
+                <button id="modal-close" class="modal-close">✕</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                Modal content goes here
+            </div>
+            <div class="modal-footer" id="modal-footer">
+                <!-- Modal buttons will be added here -->
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
