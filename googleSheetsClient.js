@@ -1,4 +1,8 @@
 // googleSheetsClient.js - Client pour Google Sheets synchronisation
+export async function addOrderToSheets(orderData) { ... }
+export async function loadOrdersFromSheets() { ... }
+// etc.
+
 // ⚠️ REMPLACEZ cette URL par la vôtre obtenue après déploiement
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz0PD6p7JsL9nUOD155u3AmrQvgt_Wi3VOH19DQpudfEa0Hi3nH3b9QkMa1o7QQ-IueEQ/exec';
 
