@@ -1,6 +1,4 @@
 // Application Data with full dataset
-import { addOrderToFirestore, loadOrdersFromFirestore } from './firebaseClient.js';
-
 const appData = {
   "wilayas": [
     {"id": 1, "name_fr": "Adrar", "name_ar": "أدرار", "code": "01", "shipping_cost": 500, "communes": ["Adrar", "Tamest", "Charouine", "Reggane", "In Salah"]},
@@ -9,58 +7,10 @@ const appData = {
     {"id": 4, "name_fr": "Oum El Bouaghi", "name_ar": "أم البواقي", "code": "04", "shipping_cost": 400, "communes": ["Oum El Bouaghi", "Ain Beida", "Ain M'Lila", "Behir Chergui", "El Amiria"]},
     {"id": 5, "name_fr": "Batna", "name_ar": "باتنة", "code": "05", "shipping_cost": 400, "communes": ["Batna", "Barika", "Arris", "Biskra", "Merouana"]},
     {"id": 6, "name_fr": "Béjaïa", "name_ar": "بجاية", "code": "06", "shipping_cost": 350, "communes": ["Béjaïa", "Akbou", "El Kseur", "Sidi Aich", "Amizour"]},
-    {"id": 7, "name_fr": "Biskra", "name_ar": "بسكرة", "code": "07", "shipping_cost": 450, "communes": ["Biskra", "Tolga", "Ouled Djellal", "Sidi Okba", "Chetma"]},
-    {"id": 8, "name_fr": "Béchar", "name_ar": "بشار", "code": "08", "shipping_cost": 600, "communes": ["Béchar", "Abadla", "Beni Ounif", "Kenadsa", "Lahmar"]},
-    {"id": 9, "name_fr": "Blida", "name_ar": "البليدة", "code": "09", "shipping_cost": 300, "communes": ["Blida", "Boufarik", "Larbaa", "Soumaa", "Beni Mered"]},
-    {"id": 10, "name_fr": "Bouira", "name_ar": "البويرة", "code": "10", "shipping_cost": 350, "communes": ["Bouira", "Lakhdaria", "M'Chedallah", "Sour El Ghozlane", "Aïn Bessem"]},
-    {"id": 11, "name_fr": "Tamanrasset", "name_ar": "تمنراست", "code": "11", "shipping_cost": 800, "communes": ["Tamanrasset", "In Guezzam", "In Salah", "Tin Zaouaten", "Idles"]},
-    {"id": 12, "name_fr": "Tébessa", "name_ar": "تبسة", "code": "12", "shipping_cost": 450, "communes": ["Tébessa", "Cheria", "El Aouinet", "Bir El Ater", "Negrine"]},
-    {"id": 13, "name_fr": "Tlemcen", "name_ar": "تلمسان", "code": "13", "shipping_cost": 450, "communes": ["Tlemcen", "Remchi", "Hennaya", "Chetouane", "Ouled Mimoun"]},
-    {"id": 14, "name_fr": "Tiaret", "name_ar": "تيارت", "code": "14", "shipping_cost": 400, "communes": ["Tiaret", "Sougueur", "Mahdia", "Ksar Chellala", "Frenda"]},
-    {"id": 15, "name_fr": "Tizi Ouzou", "name_ar": "تيزي وزو", "code": "15", "shipping_cost": 350, "communes": ["Tizi Ouzou", "Azazga", "Azeffoun", "Tigzirt", "Draa Ben Khedda"]},
     {"id": 16, "name_fr": "Alger", "name_ar": "الجزائر", "code": "16", "shipping_cost": 250, "communes": ["Alger Centre", "Sidi M'Hamed", "El Madania", "Bab El Oued", "Bologhine", "Casbah", "El Harrach", "Baraki", "Hussein Dey", "Kouba", "Bachdjerrah", "Dar El Beida", "Bab Ezzouar"]},
-    {"id": 17, "name_fr": "Djelfa", "name_ar": "الجلفة", "code": "17", "shipping_cost": 400, "communes": ["Djelfa", "Messaad", "Hassi Bahbah", "Ain Oussera", "Birine"]},
-    {"id": 18, "name_fr": "Jijel", "name_ar": "جيجل", "code": "18", "shipping_cost": 400, "communes": ["Jijel", "Taher", "El Milia", "Ferdjioua", "Sidi Abdelaziz"]},
-    {"id": 19, "name_fr": "Sétif", "name_ar": "سطيف", "code": "19", "shipping_cost": 350, "communes": ["Sétif", "El Eulma", "Bougaa", "Ain Oulmene", "Djemila"]},
-    {"id": 20, "name_fr": "Saïda", "name_ar": "سعيدة", "code": "20", "shipping_cost": 450, "communes": ["Saïda", "Doui Thabet", "Ouled Brahim", "Hassasna", "Moulay Larbi"]},
-    {"id": 21, "name_fr": "Skikda", "name_ar": "سكيكدة", "code": "21", "shipping_cost": 400, "communes": ["Skikda", "Azzaba", "Collo", "Tamalous", "Ramdane Djamel"]},
-    {"id": 22, "name_fr": "Sidi Bel Abbès", "name_ar": "سيدي بلعباس", "code": "22", "shipping_cost": 400, "communes": ["Sidi Bel Abbès", "Telagh", "Ras El Ma", "Ben Badis", "Mostefa Ben Brahim"]},
-    {"id": 23, "name_fr": "Annaba", "name_ar": "عنابة", "code": "23", "shipping_cost": 400, "communes": ["Annaba", "El Hadjar", "Berrahal", "El Bouni", "Sidi Amar"]},
-    {"id": 24, "name_fr": "Guelma", "name_ar": "قالمة", "code": "24", "shipping_cost": 400, "communes": ["Guelma", "Bouchegouf", "Heliopolis", "Hammam Debagh", "Oued Zenati"]},
     {"id": 25, "name_fr": "Constantine", "name_ar": "قسنطينة", "code": "25", "shipping_cost": 350, "communes": ["Constantine", "Hamma Bouziane", "Didouche Mourad", "El Khroub", "Ain Abid", "Ibn Ziad"]},
-    {"id": 26, "name_fr": "Médéa", "name_ar": "المدية", "code": "26", "shipping_cost": 350, "communes": ["Médéa", "Berrouaghia", "Ksar El Boukhari", "Ouzera", "Chellalet El Adhaoura"]},
-    {"id": 27, "name_fr": "Mostaganem", "name_ar": "مستغانم", "code": "27", "shipping_cost": 400, "communes": ["Mostaganem", "Relizane", "Ain Tedeles", "Hassi Mameche", "Sidi Ali"]},
-    {"id": 28, "name_fr": "M'Sila", "name_ar": "المسيلة", "code": "28", "shipping_cost": 400, "communes": ["M'Sila", "Bou Saada", "Sidi Aissa", "Ain El Hadjel", "Hammam Dalaa"]},
-    {"id": 29, "name_fr": "Mascara", "name_ar": "معسكر", "code": "29", "shipping_cost": 400, "communes": ["Mascara", "Sig", "Mohammadia", "Tighennif", "Bouhanifia"]},
-    {"id": 30, "name_fr": "Ouargla", "name_ar": "ورقلة", "code": "30", "shipping_cost": 500, "communes": ["Ouargla", "Hassi Messaoud", "Nezla", "Sidi Khouiled", "Ain Beida"]},
     {"id": 31, "name_fr": "Oran", "name_ar": "وهران", "code": "31", "shipping_cost": 400, "communes": ["Oran", "Gdyel", "Bir El Djir", "Hassi Bounif", "Es Senia", "Arzew", "Bethioua", "Ain El Turck"]},
-    {"id": 32, "name_fr": "El Bayadh", "name_ar": "البيض", "code": "32", "shipping_cost": 500, "communes": ["El Bayadh", "Rogassa", "Stitten", "Brezina", "Boualem"]},
-    {"id": 33, "name_fr": "Illizi", "name_ar": "إليزي", "code": "33", "shipping_cost": 800, "communes": ["Illizi", "Djanet", "In Amenas", "Debdeb", "Bordj Omar Driss"]},
-    {"id": 34, "name_fr": "Bordj Bou Arréridj", "name_ar": "برج بوعريريج", "code": "34", "shipping_cost": 350, "communes": ["Bordj Bou Arreridj", "Ras El Oued", "Bordj Zemoura", "Mansourah", "El Achir"]},
-    {"id": 35, "name_fr": "Boumerdès", "name_ar": "بومرداس", "code": "35", "shipping_cost": 300, "communes": ["Boumerdès", "Dellys", "Naciria", "Isser", "Zemmouri"]},
-    {"id": 36, "name_fr": "El Tarf", "name_ar": "الطارف", "code": "36", "shipping_cost": 450, "communes": ["El Tarf", "El Kala", "Bouhadjar", "Ben M'Hidi", "Boutheldja"]},
-    {"id": 37, "name_fr": "Tindouf", "name_ar": "تندوف", "code": "37", "shipping_cost": 700, "communes": ["Tindouf", "Oum El Assel"]},
-    {"id": 38, "name_fr": "Tissemsilt", "name_ar": "تيسمسيلت", "code": "38", "shipping_cost": 400, "communes": ["Tissemsilt", "Theniet El Had", "Bordj Bou Naama", "Lazharia", "Beni Chaib"]},
-    {"id": 39, "name_fr": "El Oued", "name_ar": "الوادي", "code": "39", "shipping_cost": 500, "communes": ["El Oued", "Robbah", "Guemar", "Still", "Magrane"]},
-    {"id": 40, "name_fr": "Khenchela", "name_ar": "خنشلة", "code": "40", "shipping_cost": 450, "communes": ["Khenchela", "Kais", "Baghai", "El Hamma", "Ouled Rechache"]},
-    {"id": 41, "name_fr": "Souk Ahras", "name_ar": "سوق أهراس", "code": "41", "shipping_cost": 450, "communes": ["Souk Ahras", "Sedrata", "Heddada", "Ouled Driss", "Tiffech"]},
-    {"id": 42, "name_fr": "Tipaza", "name_ar": "تيبازة", "code": "42", "shipping_cost": 300, "communes": ["Tipaza", "Cherchell", "Menaceur", "Sidi Amar", "Douaouda"]},
-    {"id": 43, "name_fr": "Mila", "name_ar": "ميلة", "code": "43", "shipping_cost": 400, "communes": ["Mila", "Ferdjioua", "Chelghoum Laid", "Oued Athmania", "Rouached"]},
-    {"id": 44, "name_fr": "Aïn Defla", "name_ar": "عين الدفلى", "code": "44", "shipping_cost": 350, "communes": ["Ain Defla", "Khemis Miliana", "El Attaf", "Boumedfaa", "Djelida"]},
-    {"id": 45, "name_fr": "Naâma", "name_ar": "النعامة", "code": "45", "shipping_cost": 550, "communes": ["Naama", "Mecheria", "Ain Sefra", "Tiout", "Sfissifa"]},
-    {"id": 46, "name_fr": "Aïn Témouchent", "name_ar": "عين تموشنت", "code": "46", "shipping_cost": 450, "communes": ["Ain Temouchent", "Hammam Bouhadjar", "Oulhaça", "Beni Saf", "El Malah"]},
-    {"id": 47, "name_fr": "Ghardaïa", "name_ar": "غرداية", "code": "47", "shipping_cost": 500, "communes": ["Ghardaia", "El Menia", "Berriane", "Metlili", "El Guerrara"]},
-    {"id": 48, "name_fr": "Relizane", "name_ar": "غليزان", "code": "48", "shipping_cost": 400, "communes": ["Relizane", "Mazouna", "Oued Rhiou", "Yellel", "Sidi Lazreg"]},
-    {"id": 49, "name_fr": "Timimoun", "name_ar": "تيميمون", "code": "49", "shipping_cost": 600, "communes": ["Timimoun", "Ouled Said", "Aougrout", "Deldoul", "Metarfa"]},
-    {"id": 50, "name_fr": "Bordj Badji Mokhtar", "name_ar": "برج باجي مختار", "code": "50", "shipping_cost": 800, "communes": ["Bordj Badji Mokhtar", "Timiaouine"]},
-    {"id": 51, "name_fr": "Ouled Djellal", "name_ar": "أولاد جلال", "code": "51", "shipping_cost": 450, "communes": ["Ouled Djellal", "Sidi Khaled", "Besbes", "Doucen", "Chaiba"]},
-    {"id": 52, "name_fr": "Béni Abbès", "name_ar": "بني عباس", "code": "52", "shipping_cost": 650, "communes": ["Beni Abbes", "Tabelbala", "Igli", "Ouled Khodeir", "El Ouata"]},
-    {"id": 53, "name_fr": "In Salah", "name_ar": "عين صالح", "code": "53", "shipping_cost": 700, "communes": ["In Salah", "In Ghar", "Foggaret Ezzoua"]},
-    {"id": 54, "name_fr": "In Guezzam", "name_ar": "عين قزّام", "code": "54", "shipping_cost": 900, "communes": ["In Guezzam", "Tin Zaouaten"]},
-    {"id": 55, "name_fr": "Touggourt", "name_ar": "تقرت", "code": "55", "shipping_cost": 500, "communes": ["Touggourt", "Temacine", "Megarine", "Sidi Slimane", "Nezla"]},
-    {"id": 56, "name_fr": "Djanet", "name_ar": "جانت", "code": "56", "shipping_cost": 850, "communes": ["Djanet", "Bordj El Haouas"]},
-    {"id": 57, "name_fr": "El M'Ghair", "name_ar": "المغير", "code": "57", "shipping_cost": 500, "communes": ["El M'Ghair", "Djamaa", "Sidi Amrane", "Still", "Oum Touyour"]},
-    {"id": 58, "name_fr": "El Meniaa", "name_ar": "المنيعة", "code": "58", "shipping_cost": 550, "communes": ["El Meniaa", "Hassi Gara", "Hassi Fehal"]}
+    {"id": 19, "name_fr": "Sétif", "name_ar": "سطيف", "code": "19", "shipping_cost": 350, "communes": ["Sétif", "El Eulma", "Bougaa", "Ain Oulmene", "Djemila"]}
   ],
   "products": [
     {
@@ -248,55 +198,6 @@ const translations = {
 
 function t(key) {
   return translations[currentLanguage][key] || key;
-}
-
-// *** NOUVELLE FONCTION: Charger les commandes depuis Firebase ***
-async function loadAndRenderOrders() {
-  try {
-    showLoading();
-    console.log('🔥 Chargement des commandes depuis Firebase...');
-    
-    const orders = await loadOrdersFromFirestore();
-    console.log('✅ Commandes chargées depuis Firebase:', orders.length, 'commandes');
-    
-    // Mettre à jour les données locales avec les données Firebase
-    appData.orders = orders || [];
-    
-    // Re-render les interfaces qui utilisent les commandes
-    if (currentAdminSection === 'orders') {
-      renderOrdersTable();
-    }
-    
-    // Mettre à jour les statistiques du dashboard
-    if (currentAdminSection === 'dashboard') {
-      updateDashboardStats();
-    }
-    
-    hideLoading();
-    console.log('✅ Interface mise à jour avec les données Firebase');
-  } catch (error) {
-    console.error('❌ Erreur chargement commandes Firebase:', error);
-    showToast('Erreur lors du chargement des commandes', 'error');
-    hideLoading();
-  }
-}
-
-// Helper function to update dashboard stats
-function updateDashboardStats() {
-  const totalRevenue = appData.orders.reduce((sum, order) => sum + order.total + order.shipping_cost, 0);
-  const totalOrders = appData.orders.length;
-  const pendingOrders = appData.orders.filter(o => o.status === 'En attente').length;
-  const shippedOrders = appData.orders.filter(o => o.status === 'Expédiée').length;
-  
-  const totalRevenueEl = document.getElementById('total-revenue');
-  const totalOrdersEl = document.getElementById('total-orders');
-  const pendingOrdersEl = document.getElementById('pending-orders');
-  const shippedOrdersEl = document.getElementById('shipped-orders');
-  
-  if (totalRevenueEl) totalRevenueEl.textContent = formatPrice(totalRevenue);
-  if (totalOrdersEl) totalOrdersEl.textContent = totalOrders;
-  if (pendingOrdersEl) pendingOrdersEl.textContent = pendingOrders;
-  if (shippedOrdersEl) shippedOrdersEl.textContent = shippedOrders;
 }
 
 // Utility Functions
@@ -1643,8 +1544,7 @@ function updateOrderSummary() {
   `;
 }
 
-// *** FONCTION MODIFIEE: Submit Order avec Firebase ***
-async function submitOrder(event) {
+function submitOrder(event) {
   event.preventDefault();
   
   if (cart.length === 0) {
@@ -1674,7 +1574,8 @@ async function submitOrder(event) {
   
   showLoading();
   
-  try {
+  // Simulate order processing
+  setTimeout(() => {
     const wilaya = appData.wilayas.find(w => w.id === parseInt(formData.wilaya_id));
     const subtotal = cart.reduce((sum, item) => {
       const discountedPrice = item.product.promotion > 0 ? 
@@ -1683,7 +1584,7 @@ async function submitOrder(event) {
       return sum + (discountedPrice * item.quantity);
     }, 0);
     
-    const newOrderId = 'CMD-' + String(Date.now()).slice(-6); // ID unique basé sur timestamp
+    const newOrderId = 'CMD-' + String(appData.orders.length + 1).padStart(3, '0');
     
     const newOrder = {
       id: newOrderId,
@@ -1712,49 +1613,31 @@ async function submitOrder(event) {
       })
     };
     
-    // *** MODIFICATION: Ajouter dans Firestore ***
-    console.log('🔥 Envoi de la commande vers Firebase:', newOrder);
-    const orderId = await addOrderToFirestore(newOrder);
+    appData.orders.unshift(newOrder);
+    currentOrder = newOrder;
     
-    if (orderId) {
-      console.log('✅ Commande créée dans Firebase avec ID:', orderId);
-      
-      // Ajouter aussi localement pour la continuité de l'interface
-      appData.orders.unshift(newOrder);
-      currentOrder = newOrder;
-      
-      // Clear cart
-      cart = [];
-      updateCartCount();
-      
-      // Reset form
-      const checkoutForm = document.getElementById('checkout-form');
-      if (checkoutForm) {
-        checkoutForm.reset();
-      }
-      
-      hideLoading();
-      
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = currentLanguage === 'ar' ? 'تأكيد الطلب' : 'Confirmer la commande';
-      }
-      
-      renderConfirmationPage(newOrder);
-      navigateToPage('confirmation');
-      
-      showToast(t('order_placed'));
+    // Clear cart
+    cart = [];
+    updateCartCount();
+    
+    // Reset form
+    const checkoutForm = document.getElementById('checkout-form');
+    if (checkoutForm) {
+      checkoutForm.reset();
     }
-  } catch (error) {
-    console.error('❌ Erreur lors de la création de la commande:', error);
-    showToast('Erreur lors de la création de la commande', 'error');
     
     hideLoading();
+    
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.textContent = currentLanguage === 'ar' ? 'تأكيد الطلب' : 'Confirmer la commande';
     }
-  }
+    
+    renderConfirmationPage(newOrder);
+    navigateToPage('confirmation');
+    
+    showToast(t('order_placed'));
+  }, 2000);
 }
 
 function renderConfirmationPage(order) {
@@ -1823,20 +1706,29 @@ function adminLogout() {
   showToast(t('logout_success'));
 }
 
-// *** FONCTION MODIFIEE: Admin Dashboard avec chargement Firebase ***
-async function renderAdminDashboard() {
+function renderAdminDashboard() {
   if (!isAdminAuthenticated) {
     navigateToPage('admin-login');
     return;
   }
   
-  console.log('🔥 Rendering admin dashboard avec Firebase');
-  
-  // *** MODIFICATION: Charger les commandes depuis Firebase d'abord ***
-  await loadAndRenderOrders();
+  console.log('Rendering admin dashboard');
   
   // Update statistics
-  updateDashboardStats();
+  const totalRevenue = appData.orders.reduce((sum, order) => sum + order.total + order.shipping_cost, 0);
+  const totalOrders = appData.orders.length;
+  const pendingOrders = appData.orders.filter(o => o.status === 'En attente').length;
+  const shippedOrders = appData.orders.filter(o => o.status === 'Expédiée').length;
+  
+  const totalRevenueEl = document.getElementById('total-revenue');
+  const totalOrdersEl = document.getElementById('total-orders');
+  const pendingOrdersEl = document.getElementById('pending-orders');
+  const shippedOrdersEl = document.getElementById('shipped-orders');
+  
+  if (totalRevenueEl) totalRevenueEl.textContent = formatPrice(totalRevenue);
+  if (totalOrdersEl) totalOrdersEl.textContent = totalOrders;
+  if (pendingOrdersEl) pendingOrdersEl.textContent = pendingOrders;
+  if (shippedOrdersEl) shippedOrdersEl.textContent = shippedOrders;
   
   // Show dashboard section
   showAdminSection('dashboard');
@@ -1872,8 +1764,7 @@ function showAdminSection(sectionName) {
   // Load section content
   switch (sectionName) {
     case 'orders':
-      // *** MODIFICATION: Charger depuis Firebase ***
-      loadAndRenderOrders();
+      renderOrdersTable();
       break;
     case 'products':
       renderProductsTable();
@@ -2228,7 +2119,7 @@ function deleteProduct(productId) {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🔥 DOM loaded, initializing app with Firebase...');
+  console.log('DOM loaded, initializing app...');
   
   try {
     // Language selector
@@ -2438,9 +2329,9 @@ document.addEventListener('DOMContentLoaded', function() {
     renderHomePage();
     updateCartCount();
     
-    console.log('✅ App initialized successfully with Firebase integration');
+    console.log('App initialized successfully');
   } catch (error) {
-    console.error('❌ Error initializing app:', error);
+    console.error('Error initializing app:', error);
   }
 });
 
