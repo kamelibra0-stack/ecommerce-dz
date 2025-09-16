@@ -1756,13 +1756,16 @@ function adminLogout() {
   showToast(t('logout_success'));
 }
 
-function renderAdminDashboard() {
+async function renderAdminDashboard() {
   if (!isAdminAuthenticated) {
     navigateToPage('admin-login');
     return;
   }
   
   console.log('Rendering admin dashboard');
+  
+  // *** MODIFICATION: Charger les commandes depuis Firebase d'abord ***
+  await loadAndRenderOrders();
   
   // Update statistics
   const totalRevenue = appData.orders.reduce((sum, order) => sum + order.total + order.shipping_cost, 0);
