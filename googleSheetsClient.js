@@ -1,11 +1,11 @@
-// googleSheetsClient.js - Client pour Google Sheets
+// googleSheetsClient.js - Client pour Google Sheets synchronisation
 // ⚠️ REMPLACEZ cette URL par la vôtre obtenue après déploiement
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz0PD6p7JsL9nUOD155u3AmrQvgt_Wi3VOH19DQpudfEa0Hi3nH3b9QkMa1o7QQ-IueEQ/exec';
 
 // ✅ Ajouter une commande dans Google Sheets
 export async function addOrderToSheets(orderData) {
   try {
-    console.log('📤 Envoi commande vers Google Sheets:', orderData);
+    console.log('📊 Envoi commande vers Google Sheets:', orderData);
     
     const response = await fetch(SHEETS_URL, {
       method: 'POST',
@@ -35,7 +35,7 @@ export async function addOrderToSheets(orderData) {
 // ✅ Charger toutes les commandes depuis Google Sheets
 export async function loadOrdersFromSheets() {
   try {
-    console.log('📥 Chargement commandes depuis Google Sheets...');
+    console.log('📊 Chargement commandes depuis Google Sheets...');
     
     const response = await fetch(SHEETS_URL + '?action=getOrders', {
       method: 'GET'
@@ -59,7 +59,7 @@ export async function loadOrdersFromSheets() {
 // ✅ Mettre à jour le statut d'une commande
 export async function updateOrderStatusInSheets(orderId, newStatus, newStatusAr) {
   try {
-    console.log('🔄 Mise à jour statut commande dans Sheets:', orderId, newStatus);
+    console.log('📊 Mise à jour statut dans Sheets:', orderId, newStatus);
     
     const response = await fetch(SHEETS_URL, {
       method: 'POST',
@@ -83,7 +83,7 @@ export async function updateOrderStatusInSheets(orderId, newStatus, newStatusAr)
     console.log('✅ Statut mis à jour dans Google Sheets');
     return result;
   } catch (error) {
-    console.error('❌ Erreur mise à jour statut Google Sheets:', error);
+    console.error('❌ Erreur mise à jour Google Sheets:', error);
     throw error;
   }
 }
@@ -91,7 +91,7 @@ export async function updateOrderStatusInSheets(orderId, newStatus, newStatusAr)
 // ✅ Supprimer une commande
 export async function deleteOrderFromSheets(orderId) {
   try {
-    console.log('🗑️ Suppression commande dans Sheets:', orderId);
+    console.log('📊 Suppression commande dans Sheets:', orderId);
     
     const response = await fetch(SHEETS_URL, {
       method: 'POST',
@@ -121,7 +121,7 @@ export async function deleteOrderFromSheets(orderId) {
 // ✅ Tester la connexion Google Sheets
 export async function testSheetsConnection() {
   try {
-    console.log('🔍 Test connexion Google Sheets...');
+    console.log('📊 Test connexion Google Sheets...');
     
     const response = await fetch(SHEETS_URL + '?action=testConnection', {
       method: 'GET'
