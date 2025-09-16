@@ -1545,7 +1545,7 @@ function updateOrderSummary() {
   `;
 }
 
-function submitOrder(event) {
+async function submitOrder(event) {
   event.preventDefault();
   
   if (cart.length === 0) {
@@ -1575,8 +1575,7 @@ function submitOrder(event) {
   
   showLoading();
   
-  // Simulate order processing
-  setTimeout(() => {
+  try {
     const wilaya = appData.wilayas.find(w => w.id === parseInt(formData.wilaya_id));
     const subtotal = cart.reduce((sum, item) => {
       const discountedPrice = item.product.promotion > 0 ? 
@@ -1614,25 +1613,48 @@ function submitOrder(event) {
       })
     };
     
-    appData.orders.unshift(newOrder);
-    currentOrder = newOrder;
+    // *** MODIFICATION: Ajouter dans Firestore au lieu du stockage local ***
+    const orderId = await addOrderToFirestore(newOrder);
     
-    // Clear cart
-    cart = [];
-    updateCartCount();
-    
-    // Reset form
-    const checkoutForm = document.getElementById('checkout-form');
-    if (checkoutForm) {
-      checkoutForm.reset();
+    if (orderId) {
+      // Ajouter aussi localement pour la continuité de l'interface
+      appData.orders.unshift(newOrder);
+      currentOrder = newOrder;
+      
+      // Clear cart
+      cart = [];
+      updateCartCount();
+      
+      // Reset form
+      const checkoutForm = document.getElementById('checkout-form');
+      if (checkoutForm) {
+        checkoutForm.reset();
+      }
+      
+      hideLoading();
+      
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = currentLanguage === 'ar' ? 'تأكيد الطلب' : 'Confirmer la commande';
+      }
+      
+      renderConfirmationPage(newOrder);
+      navigateToPage('confirmation');
+      
+      showToast(t('order_placed'));
     }
+  } catch (error) {
+    console.error('Erreur lors de la création de la commande:', error);
+    showToast('Erreur lors de la création de la commande', 'error');
     
     hideLoading();
-    
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.textContent = currentLanguage === 'ar' ? 'تأكيد الطلب' : 'Confirmer la commande';
     }
+  }
+}
+
     
     renderConfirmationPage(newOrder);
     navigateToPage('confirmation');
