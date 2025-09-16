@@ -1,5 +1,4 @@
 // Application Data with full dataset
-import { addOrderToFirestore, loadOrdersFromFirestore, testFirebaseConnection } from './firebaseClient.js';
 const appData = {
   "wilayas": [
     {"id": 1, "name_fr": "Adrar", "name_ar": "أدرار", "code": "01", "shipping_cost": 500, "communes": ["Adrar", "Tamest", "Charouine", "Reggane", "In Salah"]},
