@@ -2365,3 +2365,4 @@ window.removeProductPhoto = removeProductPhoto;
 window.saveLogo = saveLogo;
 window.cancelLogoUpload = cancelLogoUpload;
 window.resetToDefaultLogo = resetToDefaultLogo;
+import { addOrderToSheets, loadOrdersFromSheets, ... } from './googleSheetsClient.js';
