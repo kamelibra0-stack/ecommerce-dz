@@ -1,6 +1,4 @@
 // Application Data with full dataset
-// *** AJOUT: Import Google Sheets ***
-import { addOrderToSheets, loadOrdersFromSheets, updateOrderStatusInSheets, deleteOrderFromSheets, testSheetsConnection } from './googleSheetsClient.js';
 
 const appData = {
   "wilayas": [
