@@ -197,6 +197,33 @@ const translations = {
   }
 };
 
+// *** NOUVELLE FONCTION: Charger les commandes depuis Firebase ***
+async function loadAndRenderOrders() {
+  try {
+    showLoading();
+    const orders = await loadOrdersFromFirestore();
+    
+    // Mettre à jour les données locales avec les données Firebase
+    appData.orders = orders;
+    
+    // Re-render les interfaces qui utilisent les commandes
+    if (currentAdminSection === 'orders') {
+      renderOrdersTable();
+    }
+    
+    // Mettre à jour les statistiques du dashboard
+    if (currentAdminSection === 'dashboard') {
+      renderAdminDashboard();
+    }
+    
+    hideLoading();
+  } catch (error) {
+    console.error('Erreur chargement commandes Firebase:', error);
+    showToast('Erreur lors du chargement des commandes', 'error');
+    hideLoading();
+  }
+}
+
 function t(key) {
   return translations[currentLanguage][key] || key;
 }
