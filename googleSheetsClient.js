@@ -1,6 +1,6 @@
 // googleSheetsClient.js - Client pour Google Sheets
 // ⚠️ REMPLACEZ cette URL par la vôtre obtenue après déploiement
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxNE8-nCiZYwqcWY8ByepwKVzZp5NnnFzB197rrpZ6FEy4pWfjg-pfMbX4fN4HhMnFp/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzNMazgFIvQh13o8VG3Jk94J4tm6Y5jgxlDiXqb9EzKBhtm8T1ucCQ2uh1xLaSHxeSj/exec';
 
 // ✅ Ajouter une commande dans Google Sheets
 export async function addOrderToSheets(orderData) {
