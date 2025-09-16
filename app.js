@@ -1,4 +1,3 @@
-import { addOrderToSheets, loadOrdersFromSheets, ... } from './googleSheetsClient.js';
 
 // Application Data with full dataset
 const appData = {
