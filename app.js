@@ -1,5 +1,4 @@
 // Application Data with full dataset
-import { addOrderToFirestore, loadOrdersFromFirestore } from './firebaseClient.js';
 const appData = {
   "wilayas": [
     {"id": 1, "name_fr": "Adrar", "name_ar": "أدرار", "code": "01", "shipping_cost": 500, "communes": ["Adrar", "Tamest", "Charouine", "Reggane", "In Salah"]},
@@ -196,33 +195,6 @@ const translations = {
     'product_created': 'تم إنشاء المنتج بنجاح'
   }
 };
-
-// *** NOUVELLE FONCTION: Charger les commandes depuis Firebase ***
-async function loadAndRenderOrders() {
-  try {
-    showLoading();
-    const orders = await loadOrdersFromFirestore();
-    
-    // Mettre à jour les données locales avec les données Firebase
-    appData.orders = orders;
-    
-    // Re-render les interfaces qui utilisent les commandes
-    if (currentAdminSection === 'orders') {
-      renderOrdersTable();
-    }
-    
-    // Mettre à jour les statistiques du dashboard
-    if (currentAdminSection === 'dashboard') {
-      renderAdminDashboard();
-    }
-    
-    hideLoading();
-  } catch (error) {
-    console.error('Erreur chargement commandes Firebase:', error);
-    showToast('Erreur lors du chargement des commandes', 'error');
-    hideLoading();
-  }
-}
 
 function t(key) {
   return translations[currentLanguage][key] || key;
@@ -1572,7 +1544,7 @@ function updateOrderSummary() {
   `;
 }
 
-async function submitOrder(event) {
+function submitOrder(event) {
   event.preventDefault();
   
   if (cart.length === 0) {
@@ -1602,7 +1574,8 @@ async function submitOrder(event) {
   
   showLoading();
   
-  try {
+  // Simulate order processing
+  setTimeout(() => {
     const wilaya = appData.wilayas.find(w => w.id === parseInt(formData.wilaya_id));
     const subtotal = cart.reduce((sum, item) => {
       const discountedPrice = item.product.promotion > 0 ? 
@@ -1640,48 +1613,25 @@ async function submitOrder(event) {
       })
     };
     
-    // *** MODIFICATION: Ajouter dans Firestore au lieu du stockage local ***
-    const orderId = await addOrderToFirestore(newOrder);
+    appData.orders.unshift(newOrder);
+    currentOrder = newOrder;
     
-    if (orderId) {
-      // Ajouter aussi localement pour la continuité de l'interface
-      appData.orders.unshift(newOrder);
-      currentOrder = newOrder;
-      
-      // Clear cart
-      cart = [];
-      updateCartCount();
-      
-      // Reset form
-      const checkoutForm = document.getElementById('checkout-form');
-      if (checkoutForm) {
-        checkoutForm.reset();
-      }
-      
-      hideLoading();
-      
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = currentLanguage === 'ar' ? 'تأكيد الطلب' : 'Confirmer la commande';
-      }
-      
-      renderConfirmationPage(newOrder);
-      navigateToPage('confirmation');
-      
-      showToast(t('order_placed'));
+    // Clear cart
+    cart = [];
+    updateCartCount();
+    
+    // Reset form
+    const checkoutForm = document.getElementById('checkout-form');
+    if (checkoutForm) {
+      checkoutForm.reset();
     }
-  } catch (error) {
-    console.error('Erreur lors de la création de la commande:', error);
-    showToast('Erreur lors de la création de la commande', 'error');
     
     hideLoading();
+    
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.textContent = currentLanguage === 'ar' ? 'تأكيد الطلب' : 'Confirmer la commande';
     }
-  }
-}
-
     
     renderConfirmationPage(newOrder);
     navigateToPage('confirmation');
@@ -1756,16 +1706,13 @@ function adminLogout() {
   showToast(t('logout_success'));
 }
 
-async function renderAdminDashboard() {
+function renderAdminDashboard() {
   if (!isAdminAuthenticated) {
     navigateToPage('admin-login');
     return;
   }
   
   console.log('Rendering admin dashboard');
-  
-  // *** MODIFICATION: Charger les commandes depuis Firebase d'abord ***
-  await loadAndRenderOrders();
   
   // Update statistics
   const totalRevenue = appData.orders.reduce((sum, order) => sum + order.total + order.shipping_cost, 0);
