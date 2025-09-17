@@ -1,330 +1,4 @@
 // Application Data with full dataset
-
-// Configuration API SheetBest pour synchronisation complète
-const API_CONFIG = {
-    BASE_URL: 'https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991',
-    ENDPOINTS: {
-        ORDERS: 'https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991/tabs/Commandes',
-        PRODUCTS: 'https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991/tabs/Produits', 
-        WILAYAS: 'https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991/tabs/Wilayas',
-        STATISTICS: 'https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991/tabs/Statistiques',
-        SETTINGS: 'https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991/tabs/Parametres'
-    }
-};
-
-// Fonctions de synchronisation universelles
-class DataSync {
-    static async saveToSheet(endpoint, data) {
-        try {
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            if (response.ok) {
-                console.log('Données sauvegardées avec succès');
-                return true;
-            } else {
-                console.error('Erreur sauvegarde:', response.status);
-                return false;
-            }
-        } catch (error) {
-            console.error('Erreur réseau sauvegarde:', error);
-            return false;
-        }
-    }
-
-    static async loadFromSheet(endpoint) {
-        try {
-            const response = await fetch(endpoint);
-            if (response.ok) {
-                const data = await response.json();
-                console.log('Données chargées depuis Sheet:', data);
-                return data;
-            } else {
-                console.error('Erreur chargement:', response.status);
-                return [];
-            }
-        } catch (error) {
-            console.error('Erreur réseau chargement:', error);
-            return [];
-        }
-    }
-
-    static async updateInSheet(endpoint, id, updateData) {
-        try {
-            const response = await fetch(`${endpoint}/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updateData)
-            });
-            if (response.ok) {
-                console.log('Données mises à jour avec succès');
-                return true;
-            } else {
-                console.error('Erreur mise à jour:', response.status);
-                return false;
-            }
-        } catch (error) {
-            console.error('Erreur réseau mise à jour:', error);
-            return false;
-        }
-    }
-
-    static async deleteFromSheet(endpoint, id) {
-        try {
-            const response = await fetch(`${endpoint}/${id}`, {
-                method: 'DELETE'
-            });
-            if (response.ok) {
-                console.log('Données supprimées avec succès');
-                return true;
-            } else {
-                console.error('Erreur suppression:', response.status);
-                return false;
-            }
-        } catch (error) {
-            console.error('Erreur réseau suppression:', error);
-            return false;
-        }
-    }
-}
-
-// Synchronisation des commandes (améliorée)
-async function syncOrderToSheet(order) {
-    const orderData = {
-        id: order.id,
-        customer_name: order.customer_name,
-        phone: order.phone,
-        email: order.email || '',
-        address: order.address,
-        wilaya: order.wilaya,
-        commune: order.commune,
-        total: order.total,
-        shipping_cost: order.shipping_cost,
-        status: order.status,
-        created_at: order.created_at,
-        products: JSON.stringify(order.products),
-        updated_at: new Date().toISOString()
-    };
-    return await DataSync.saveToSheet(API_CONFIG.ENDPOINTS.ORDERS, orderData);
-}
-
-// Synchronisation des produits
-async function syncProductToSheet(product) {
-    const productData = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        category: product.category,
-        stock: product.stock,
-        image: product.image,
-        colors: JSON.stringify(product.colors || []),
-        description: product.description || '',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-    };
-    return await DataSync.saveToSheet(API_CONFIG.ENDPOINTS.PRODUCTS, productData);
-}
-
-// Synchronisation des wilayas
-async function syncWilayaToSheet(wilaya) {
-    const wilayaData = {
-        id: wilaya.id,
-        name_fr: wilaya.name_fr,
-        name_ar: wilaya.name_ar,
-        code: wilaya.code,
-        shipping_cost: wilaya.shipping_cost,
-        communes: JSON.stringify(wilaya.communes || []),
-        updated_at: new Date().toISOString()
-    };
-    return await DataSync.saveToSheet(API_CONFIG.ENDPOINTS.WILAYAS, wilayaData);
-}
-
-// Synchronisation des statistiques
-async function syncStatisticsToSheet() {
-    const stats = {
-        total_orders: appData.orders.length,
-        total_revenue: appData.orders.reduce((sum, order) => sum + order.total, 0),
-        pending_orders: appData.orders.filter(order => order.status === 'En attente').length,
-        completed_orders: appData.orders.filter(order => order.status === 'Livré').length,
-        cancelled_orders: appData.orders.filter(order => order.status === 'Annulé').length,
-        total_products: appData.products.length,
-        low_stock_products: appData.products.filter(product => product.stock < 10).length,
-        generated_at: new Date().toISOString()
-    };
-    return await DataSync.saveToSheet(API_CONFIG.ENDPOINTS.STATISTICS, stats);
-}
-
-// Fonctions de chargement depuis les sheets
-async function loadOrdersFromSheet() {
-    try {
-        const data = await DataSync.loadFromSheet(API_CONFIG.ENDPOINTS.ORDERS);
-        appData.orders = data.map(order => ({
-            id: order.id || `CMD-${Date.now()}`,
-            customer_name: order.customer_name,
-            phone: order.phone,
-            email: order.email || '',
-            address: order.address,
-            wilaya: order.wilaya,
-            commune: order.commune,
-            total: parseInt(order.total) || 0,
-            shipping_cost: parseInt(order.shipping_cost) || 0,
-            status: order.status || 'En attente',
-            created_at: order.created_at || new Date().toISOString().split('T')[0],
-            products: order.products ? JSON.parse(order.products) : []
-        })));
-        return true;
-    } catch (error) {
-        console.error('Erreur chargement commandes:', error);
-        return false;
-    }
-}
-
-async function loadProductsFromSheet() {
-    try {
-        const data = await DataSync.loadFromSheet(API_CONFIG.ENDPOINTS.PRODUCTS);
-        if (data.length > 0) {
-            appData.products = data.map(product => ({
-                id: parseInt(product.id),
-                name: product.name,
-                price: parseInt(product.price),
-                category: product.category,
-                stock: parseInt(product.stock) || 0,
-                image: product.image,
-                colors: product.colors ? JSON.parse(product.colors) : [],
-                description: product.description || ''
-            })));
-        }
-        return true;
-    } catch (error) {
-        console.error('Erreur chargement produits:', error);
-        return false;
-    }
-}
-
-async function loadWilayasFromSheet() {
-    try {
-        const data = await DataSync.loadFromSheet(API_CONFIG.ENDPOINTS.WILAYAS);
-        if (data.length > 0) {
-            appData.wilayas = data.map(wilaya => ({
-                id: parseInt(wilaya.id),
-                name_fr: wilaya.name_fr,
-                name_ar: wilaya.name_ar,
-                code: wilaya.code,
-                shipping_cost: parseInt(wilaya.shipping_cost) || 0,
-                communes: wilaya.communes ? JSON.parse(wilaya.communes) : []
-            })));
-        }
-        return true;
-    } catch (error) {
-        console.error('Erreur chargement wilayas:', error);
-        return false;
-    }
-}
-
-// Mise à jour du statut des commandes avec synchronisation
-async function updateOrderStatus(orderId, newStatus) {
-    // Mettre à jour localement
-    const order = appData.orders.find(o => o.id === orderId);
-    if (order) {
-        order.status = newStatus;
-        order.updated_at = new Date().toISOString();
-
-        // Synchroniser avec Sheet
-        await DataSync.updateInSheet(API_CONFIG.ENDPOINTS.ORDERS, orderId, {
-            status: newStatus,
-            updated_at: order.updated_at
-        });
-
-        // Mettre à jour les statistiques
-        await syncStatisticsToSheet();
-
-        return true;
-    }
-    return false;
-}
-
-// Mise à jour du stock avec synchronisation
-async function updateProductStock(productId, newStock) {
-    const product = appData.products.find(p => p.id === productId);
-    if (product) {
-        product.stock = newStock;
-
-        // Synchroniser avec Sheet
-        await DataSync.updateInSheet(API_CONFIG.ENDPOINTS.PRODUCTS, productId, {
-            stock: newStock,
-            updated_at: new Date().toISOString()
-        });
-
-        return true;
-    }
-    return false;
-}
-
-// Ajout d'un nouveau produit avec synchronisation
-async function addNewProduct(productData) {
-    const newProduct = {
-        id: appData.products.length + 1,
-        name: productData.name,
-        price: productData.price,
-        category: productData.category,
-        stock: productData.stock || 0,
-        image: productData.image,
-        colors: productData.colors || [],
-        description: productData.description || ''
-    };
-
-    appData.products.push(newProduct);
-    await syncProductToSheet(newProduct);
-    return newProduct;
-}
-
-// Ajout d'une nouvelle wilaya avec synchronisation
-async function addNewWilaya(wilayaData) {
-    const newWilaya = {
-        id: appData.wilayas.length + 1,
-        name_fr: wilayaData.name_fr,
-        name_ar: wilayaData.name_ar || '',
-        code: wilayaData.code,
-        shipping_cost: wilayaData.shipping_cost || 0,
-        communes: wilayaData.communes || []
-    };
-
-    appData.wilayas.push(newWilaya);
-    await syncWilayaToSheet(newWilaya);
-    return newWilaya;
-}
-
-// Chargement complet de toutes les données au démarrage
-async function loadAllDataFromSheets() {
-    console.log('Chargement de toutes les données depuis Google Sheets...');
-
-    // Charger dans l'ordre pour éviter les conflicts
-    await loadWilayasFromSheet();
-    await loadProductsFromSheet(); 
-    await loadOrdersFromSheet();
-
-    // Synchroniser les statistiques
-    await syncStatisticsToSheet();
-
-    console.log('Toutes les données chargées avec succès');
-    return true;
-}
-
-// Initialisation de la synchronisation complète
-async function initializeFullSync() {
-    // Charger toutes les données au démarrage
-    await loadAllDataFromSheets();
-
-    // Configurer la synchronisation automatique des statistiques toutes les 5 minutes
-    setInterval(async () => {
-        await syncStatisticsToSheet();
-    }, 5 * 60 * 1000);
-
-    console.log('Synchronisation complète initialisée');
-}
-
 const appData = {
   "wilayas": [
     {"id": 1, "name_fr": "Adrar", "name_ar": "أدرار", "code": "01", "shipping_cost": 500, "communes": ["Adrar", "Tamest", "Charouine", "Reggane", "In Salah"]},
@@ -610,6 +284,75 @@ function generateId() {
 
 function generateWilayaId() {
   return Math.max(...appData.wilayas.map(w => w.id), 0) + 1;
+}
+
+
+// Fonction simple pour synchroniser les commandes avec Google Sheets
+async function syncOrderToGoogleSheet(order) {
+    try {
+        const response = await fetch('https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: order.id,
+                customer_name: order.customer_name,
+                phone: order.phone,
+                email: order.email || '',
+                address: order.address,
+                wilaya: order.wilaya,
+                commune: order.commune,
+                total: order.total,
+                shipping_cost: order.shipping_cost,
+                status: order.status,
+                created_at: order.created_at,
+                products: JSON.stringify(order.products)
+            })
+        });
+
+        if (response.ok) {
+            console.log('Commande synchronisée avec Google Sheet');
+        } else {
+            console.error('Erreur sync Google Sheet:', response.status);
+        }
+    } catch (error) {
+        console.error('Erreur réseau sync:', error);
+    }
+}
+
+// Fonction simple pour charger les commandes depuis Google Sheets
+async function loadOrdersFromGoogleSheet() {
+    try {
+        const response = await fetch('https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991');
+        if (response.ok) {
+            const data = await response.json();
+            // Convertir et fusionner avec les commandes existantes
+            const sheetOrders = data.map(order => ({
+                id: order.id || order.ID || `CMD-${Date.now()}`,
+                customer_name: order.customer_name,
+                phone: order.phone,
+                email: order.email || '',
+                address: order.address,
+                wilaya: order.wilaya,
+                commune: order.commune,
+                total: parseInt(order.total) || 0,
+                shipping_cost: parseInt(order.shipping_cost || order.shipping) || 0,
+                status: order.status || 'En attente',
+                created_at: order.created_at || order.created || new Date().toISOString().split('T')[0],
+                products: order.products ? JSON.parse(order.products) : []
+            }));
+
+            // Fusionner avec les commandes locales (garder les deux)
+            const existingIds = appData.orders.map(o => o.id);
+            const newOrders = sheetOrders.filter(o => !existingIds.includes(o.id));
+            appData.orders = [...appData.orders, ...newOrders];
+
+            console.log('Commandes chargées depuis Google Sheet');
+            return true;
+        }
+    } catch (error) {
+        console.error('Erreur chargement commandes:', error);
+    }
+    return false;
 }
 
 // Navigation Functions
@@ -1940,9 +1683,8 @@ function submitOrder(event) {
     };
     
     appData.orders.unshift(newOrder);
-    // Synchronisation complète avec Google Sheets
-    syncOrderToSheet(newOrder);
-
+    // Synchroniser avec Google Sheets (ne casse rien)
+    syncOrderToGoogleSheet(newOrder);
     currentOrder = newOrder;
     
     // Clear cart
@@ -2036,7 +1778,6 @@ function adminLogout() {
 }
 
 function renderAdminDashboard() {
-    await loadAllDataFromSheets();
   if (!isAdminAuthenticated) {
     navigateToPage('admin-login');
     return;
@@ -2061,6 +1802,8 @@ function renderAdminDashboard() {
   if (shippedOrdersEl) shippedOrdersEl.textContent = shippedOrders;
   
   // Show dashboard section
+    // Charger les commandes depuis Google Sheet
+    await loadOrdersFromGoogleSheet();
   showAdminSection('dashboard');
   
   // Create chart
