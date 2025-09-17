@@ -1,5 +1,3 @@
-import { addOrderToSheets, loadOrdersFromSheets, updateOrderStatusInSheets, deleteOrderFromSheets, testSheetsConnection } from './googleSheetsClient.js';
-
 // Application Data with full dataset
 const appData = {
   "wilayas": [
@@ -2366,4 +2364,3 @@ window.removeProductPhoto = removeProductPhoto;
 window.saveLogo = saveLogo;
 window.cancelLogoUpload = cancelLogoUpload;
 window.resetToDefaultLogo = resetToDefaultLogo;
-
