@@ -1617,7 +1617,7 @@ function submitOrder(event) {
 
     // Envoyer la commande vers Google Sheets via SheetBest
     // REMPLACE 'ton-id-unique' par l'ID que SheetBest te donne
-    fetch('https://api.sheetbest.com/sheets/0c8a4e48-52b2-4928-a461-06905cf4ccb0', {
+    fetch('https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
