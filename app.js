@@ -286,6 +286,39 @@ function generateWilayaId() {
   return Math.max(...appData.wilayas.map(w => w.id), 0) + 1;
 }
 
+// Fonction pour charger les commandes depuis Google Sheets
+async function loadOrdersFromSheetBest() {
+    try {
+        const response = await fetch('https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991');
+        if (response.ok) {
+            const data = await response.json();
+            // Convertir les données SheetBest vers le format appData
+            appData.orders = data.map(order => ({
+                id: order.ID || order.id || `CMD-${Date.now()}`,
+                customer_name: order.customer_name,
+                phone: order.phone,
+                email: order.email || '',
+                address: order.address,
+                wilaya: order.wilaya,
+                commune: order.commune,
+                total: parseInt(order.total) || 0,
+                shipping_cost: parseInt(order.shipping) || 0,
+                status: order.status || 'En attente',
+                created_at: order.created || new Date().toISOString().split('T')[0],
+                products: order.products ? JSON.parse(order.products) : []
+            }));
+            console.log('Commandes chargées depuis SheetBest:', appData.orders);
+            return true;
+        } else {
+            console.error('Erreur lors du chargement des commandes:', response.status);
+            return false;
+        }
+    } catch (error) {
+        console.error('Erreur réseau lors du chargement des commandes:', error);
+        return false;
+    }
+}
+
 // Navigation Functions
 function navigateToPage(pageName) {
   console.log('Navigating to:', pageName);
@@ -1614,35 +1647,6 @@ function submitOrder(event) {
     };
     
     appData.orders.unshift(newOrder);
-
-    // Envoyer la commande vers Google Sheets via SheetBest
-    // REMPLACE 'ton-id-unique' par l'ID que SheetBest te donne
-    fetch('https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            id: newOrder.id,
-            customer_name: newOrder.customer_name,
-            phone: newOrder.phone,
-            email: newOrder.email,
-            address: newOrder.address,
-            wilaya: newOrder.wilaya,
-            commune: newOrder.commune,
-            total: newOrder.total,
-            shipping_cost: newOrder.shipping_cost,
-            status: newOrder.status,
-            created_at: newOrder.created_at,
-            products: JSON.stringify(newOrder.products)
-        })
-    }).then(response => {
-        if (response.ok) {
-            console.log('Commande synchronisée avec Google Sheets');
-        } else {
-            console.error('Erreur lors de la synchronisation');
-        }
-    }).catch(error => {
-        console.error('Erreur réseau:', error);
-    });
     currentOrder = newOrder;
     
     // Clear cart
@@ -1760,6 +1764,11 @@ function renderAdminDashboard() {
   if (shippedOrdersEl) shippedOrdersEl.textContent = shippedOrders;
   
   // Show dashboard section
+    // Charger les commandes depuis SheetBest avant l'affichage
+    loadOrdersFromSheetBest().then(() => {
+        showAdminSection('dashboard');
+    });
+    return; // Sortir pour éviter le double appel
   showAdminSection('dashboard');
   
   // Create chart
