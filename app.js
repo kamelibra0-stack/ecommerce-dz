@@ -1614,6 +1614,35 @@ function submitOrder(event) {
     };
     
     appData.orders.unshift(newOrder);
+
+    // Envoyer la commande vers Google Sheets via SheetBest
+    // REMPLACE 'ton-id-unique' par l'ID que SheetBest te donne
+    fetch('https://api.sheetbest.com/sheets/0c8a4e48-52b2-4928-a461-06905cf4ccb0', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            id: newOrder.id,
+            customer_name: newOrder.customer_name,
+            phone: newOrder.phone,
+            email: newOrder.email,
+            address: newOrder.address,
+            wilaya: newOrder.wilaya,
+            commune: newOrder.commune,
+            total: newOrder.total,
+            shipping_cost: newOrder.shipping_cost,
+            status: newOrder.status,
+            created_at: newOrder.created_at,
+            products: JSON.stringify(newOrder.products)
+        })
+    }).then(response => {
+        if (response.ok) {
+            console.log('Commande synchronisée avec Google Sheets');
+        } else {
+            console.error('Erreur lors de la synchronisation');
+        }
+    }).catch(error => {
+        console.error('Erreur réseau:', error);
+    });
     currentOrder = newOrder;
     
     // Clear cart
@@ -1638,12 +1667,6 @@ function submitOrder(event) {
     
     showToast(t('order_placed'));
   }, 2000);
-  fetch('https://api.sheetbest.com/sheets/0c8a4e48-52b2-4928-a461-06905cf4ccb0', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(newOrder)
-});
-
 }
 
 function renderConfirmationPage(order) {
