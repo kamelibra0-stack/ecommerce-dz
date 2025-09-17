@@ -1638,6 +1638,12 @@ function submitOrder(event) {
     
     showToast(t('order_placed'));
   }, 2000);
+  fetch('https://api.sheetbest.com/sheets/0c8a4e48-52b2-4928-a461-06905cf4ccb0', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(newOrder)
+});
+
 }
 
 function renderConfirmationPage(order) {
