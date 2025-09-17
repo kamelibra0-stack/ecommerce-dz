@@ -1614,6 +1614,13 @@ function submitOrder(event) {
     };
     
     appData.orders.unshift(newOrder);
+
+    // Sync avec Google Sheets
+    fetch('https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrder)
+    }).catch(err => console.log('Sync error:', err));
     currentOrder = newOrder;
     
     // Clear cart
@@ -1731,8 +1738,6 @@ function renderAdminDashboard() {
   if (shippedOrdersEl) shippedOrdersEl.textContent = shippedOrders;
   
   // Show dashboard section
-    console.log('Admin dashboard ouvert - chargement commandes...');
-    loadOrdersFromSheet();
   showAdminSection('dashboard');
   
   // Create chart
