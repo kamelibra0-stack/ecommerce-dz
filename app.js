@@ -286,75 +286,6 @@ function generateWilayaId() {
   return Math.max(...appData.wilayas.map(w => w.id), 0) + 1;
 }
 
-
-// Fonction simple pour synchroniser les commandes avec Google Sheets
-async function syncOrderToGoogleSheet(order) {
-    try {
-        const response = await fetch('https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id: order.id,
-                customer_name: order.customer_name,
-                phone: order.phone,
-                email: order.email || '',
-                address: order.address,
-                wilaya: order.wilaya,
-                commune: order.commune,
-                total: order.total,
-                shipping_cost: order.shipping_cost,
-                status: order.status,
-                created_at: order.created_at,
-                products: JSON.stringify(order.products)
-            })
-        });
-
-        if (response.ok) {
-            console.log('Commande synchronisée avec Google Sheet');
-        } else {
-            console.error('Erreur sync Google Sheet:', response.status);
-        }
-    } catch (error) {
-        console.error('Erreur réseau sync:', error);
-    }
-}
-
-// Fonction simple pour charger les commandes depuis Google Sheets
-async function loadOrdersFromGoogleSheet() {
-    try {
-        const response = await fetch('https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991');
-        if (response.ok) {
-            const data = await response.json();
-            // Convertir et fusionner avec les commandes existantes
-            const sheetOrders = data.map(order => ({
-                id: order.id || order.ID || `CMD-${Date.now()}`,
-                customer_name: order.customer_name,
-                phone: order.phone,
-                email: order.email || '',
-                address: order.address,
-                wilaya: order.wilaya,
-                commune: order.commune,
-                total: parseInt(order.total) || 0,
-                shipping_cost: parseInt(order.shipping_cost || order.shipping) || 0,
-                status: order.status || 'En attente',
-                created_at: order.created_at || order.created || new Date().toISOString().split('T')[0],
-                products: order.products ? JSON.parse(order.products) : []
-            }));
-
-            // Fusionner avec les commandes locales (garder les deux)
-            const existingIds = appData.orders.map(o => o.id);
-            const newOrders = sheetOrders.filter(o => !existingIds.includes(o.id));
-            appData.orders = [...appData.orders, ...newOrders];
-
-            console.log('Commandes chargées depuis Google Sheet');
-            return true;
-        }
-    } catch (error) {
-        console.error('Erreur chargement commandes:', error);
-    }
-    return false;
-}
-
 // Navigation Functions
 function navigateToPage(pageName) {
   console.log('Navigating to:', pageName);
@@ -1683,8 +1614,14 @@ function submitOrder(event) {
     };
     
     appData.orders.unshift(newOrder);
-    // Synchroniser avec Google Sheets (ne casse rien)
-    syncOrderToGoogleSheet(newOrder);
+
+    // Sync commande avec Google Sheets
+    fetch('https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrder)
+    }).catch(err => console.log('Sync error:', err));
+
     currentOrder = newOrder;
     
     // Clear cart
@@ -1802,8 +1739,6 @@ function renderAdminDashboard() {
   if (shippedOrdersEl) shippedOrdersEl.textContent = shippedOrders;
   
   // Show dashboard section
-    // Charger les commandes depuis Google Sheet
-    await loadOrdersFromGoogleSheet();
   showAdminSection('dashboard');
   
   // Create chart
