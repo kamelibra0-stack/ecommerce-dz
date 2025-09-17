@@ -286,6 +286,95 @@ function generateWilayaId() {
   return Math.max(...appData.wilayas.map(w => w.id), 0) + 1;
 }
 
+
+// Fonction pour charger les commandes depuis Google Sheets
+async function loadOrdersFromSheet() {
+    try {
+        const response = await fetch('https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991');
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Données reçues de Google Sheets:', data);
+
+            // Convertir les données et fusionner avec les commandes locales
+            const sheetOrders = data.map(order => ({
+                id: order.id || order.ID || `CMD-${Date.now()}`,
+                customer_name: order.customer_name,
+                phone: order.phone,
+                email: order.email || '',
+                address: order.address,
+                wilaya: order.wilaya,
+                commune: order.commune,
+                total: parseInt(order.total) || 0,
+                shipping_cost: parseInt(order.shipping_cost || order.shipping) || 0,
+                status: order.status || 'En attente',
+                created_at: order.created_at || order.created || new Date().toISOString().split('T')[0],
+                products: order.products ? JSON.parse(order.products) : []
+            }));
+
+            // Mettre à jour la liste des commandes
+            appData.orders = sheetOrders;
+            console.log('Commandes chargées:', appData.orders.length);
+            return true;
+        }
+    } catch (error) {
+        console.error('Erreur chargement commandes:', error);
+    }
+    return false;
+}
+
+// Fonction pour mettre à jour le statut d'une commande
+async function updateOrderStatusInSheet(orderId, newStatus) {
+    try {
+        // D'abord mettre à jour localement
+        const order = appData.orders.find(o => o.id === orderId);
+        if (order) {
+            order.status = newStatus;
+        }
+
+        // Puis synchroniser avec Google Sheets (méthode PUT ou POST selon SheetBest)
+        const response = await fetch(`https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991/${orderId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+
+        if (response.ok) {
+            console.log('Statut mis à jour dans Google Sheets');
+            return true;
+        } else {
+            console.log('Erreur mise à jour statut:', response.status);
+            return false;
+        }
+    } catch (error) {
+        console.error('Erreur update statut:', error);
+        return false;
+    }
+}
+
+// Fonction pour supprimer une commande
+async function deleteOrderFromSheet(orderId) {
+    try {
+        // Supprimer localement
+        appData.orders = appData.orders.filter(order => order.id !== orderId);
+
+        // Supprimer de Google Sheets
+        const response = await fetch(`https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991/${orderId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            console.log('Commande supprimée de Google Sheets');
+            return true;
+        } else {
+            console.log('Erreur suppression:', response.status);
+            return false;
+        }
+    } catch (error) {
+        console.error('Erreur delete:', error);
+        return false;
+    }
+}
+
 // Navigation Functions
 function navigateToPage(pageName) {
   console.log('Navigating to:', pageName);
@@ -1614,14 +1703,6 @@ function submitOrder(event) {
     };
     
     appData.orders.unshift(newOrder);
-
-    // Sync commande avec Google Sheets
-    fetch('https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newOrder)
-    }).catch(err => console.log('Sync error:', err));
-
     currentOrder = newOrder;
     
     // Clear cart
@@ -1739,6 +1820,8 @@ function renderAdminDashboard() {
   if (shippedOrdersEl) shippedOrdersEl.textContent = shippedOrders;
   
   // Show dashboard section
+    // Charger les commandes depuis Google Sheets
+    await loadOrdersFromSheet();
   showAdminSection('dashboard');
   
   // Create chart
