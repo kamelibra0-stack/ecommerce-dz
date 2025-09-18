@@ -49,6 +49,137 @@ const appData = {
         "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&h=500&fit=crop",
         "https://images.unsplash.com/photo-1588702547919-26089e690ecc?w=500&h=500&fit=crop"
       ],
+
+// ========== SYNCHRONISATION GOOGLE SHEETS ==========
+
+// Configuration API
+const SHEET_API_URL = 'https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991';
+
+// Fonction pour envoyer une commande vers Google Sheets
+function envoyerCommandeVersSheet(commande) {
+    console.log('📤 Envoi commande vers Google Sheets:', commande.id);
+
+    const commandeData = {
+        id: commande.id,
+        customer_name: commande.customer_name,
+        phone: commande.phone,
+        email: commande.email || '',
+        address: commande.address,
+        wilaya: commande.wilaya,
+        commune: commande.commune,
+        total: commande.total,
+        shipping_cost: commande.shipping_cost,
+        status: commande.status,
+        created_at: commande.created_at,
+        products: JSON.stringify(commande.products)
+    };
+
+    fetch(SHEET_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(commandeData)
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('✅ Commande envoyée vers Google Sheets');
+        } else {
+            console.log('❌ Erreur envoi Google Sheets:', response.status);
+        }
+    })
+    .catch(error => {
+        console.error('❌ Erreur réseau:', error);
+    });
+}
+
+// Fonction pour récupérer toutes les commandes depuis Google Sheets
+function recupererCommandesDepuisSheet() {
+    console.log('📥 Récupération commandes depuis Google Sheets...');
+
+    return fetch(SHEET_API_URL)
+    .then(response => response.json())
+    .then(data => {
+        if (data && Array.isArray(data) && data.length > 0) {
+            console.log('📋 Commandes reçues:', data.length);
+
+            // Convertir les données Google Sheets vers le format appData
+            const commandesSheet = data.map(order => ({
+                id: order.id || order.ID || 'CMD-' + Date.now(),
+                customer_name: order.customer_name,
+                phone: order.phone,
+                email: order.email || '',
+                address: order.address,
+                wilaya: order.wilaya,
+                commune: order.commune,
+                total: parseInt(order.total) || 0,
+                shipping_cost: parseInt(order.shipping_cost || order.shipping) || 0,
+                status: order.status || 'En attente',
+                created_at: order.created_at || order.created || new Date().toISOString().split('T')[0],
+                products: order.products ? JSON.parse(order.products) : []
+            }));
+
+            // Fusionner avec les commandes locales existantes (éviter les doublons)
+            const commandesExistantes = appData.orders.map(cmd => cmd.id);
+            const nouvellesCommandes = commandesSheet.filter(cmd => !commandesExistantes.includes(cmd.id));
+
+            // Ajouter les nouvelles commandes
+            appData.orders = [...commandesSheet];
+
+            console.log('✅ Total commandes après sync:', appData.orders.length);
+            return true;
+        } else {
+            console.log('ℹ️ Aucune commande dans Google Sheets');
+            return false;
+        }
+    })
+    .catch(error => {
+        console.error('❌ Erreur récupération commandes:', error);
+        return false;
+    });
+}
+
+// Fonction de synchronisation automatique
+function synchronisationAutomatique() {
+    console.log('🔄 Synchronisation automatique démarrée...');
+    recupererCommandesDepuisSheet().then(success => {
+        if (success) {
+            console.log('✅ Synchronisation réussie');
+            // Rafraîchir l'affichage si on est dans l'admin
+            rafraichirAffichageAdmin();
+        }
+    });
+}
+
+// Fonction pour rafraîchir l'affichage admin
+function rafraichirAffichageAdmin() {
+    if (currentPage === 'admin-dashboard') {
+        const currentSection = document.querySelector('.admin-section.active');
+        if (currentSection) {
+            const sectionId = currentSection.id;
+            if (sectionId === 'orders-section' || sectionId === 'dashboard-section') {
+                // Rafraîchir la section active
+                if (sectionId === 'orders-section') {
+                    showAdminSection('orders');
+                } else {
+                    showAdminSection('dashboard');
+                }
+            }
+        }
+    }
+}
+
+// Initialiser la synchronisation automatique
+function initialiserSync() {
+    console.log('🚀 Initialisation synchronisation bidirectionnelle...');
+
+    // Synchronisation initiale
+    synchronisationAutomatique();
+
+    // Synchronisation automatique toutes les 30 secondes
+    setInterval(synchronisationAutomatique, 30000);
+
+    console.log('✅ Synchronisation auto configurée (30s)');
+}
+
       "category": "Informatique",
       "category_ar": "حاسوب",
       "stock": 8,
@@ -1615,12 +1746,8 @@ function submitOrder(event) {
     
     appData.orders.unshift(newOrder);
 
-    // Sync avec Google Sheets
-    fetch('https://api.sheetbest.com/sheets/693e0e0f-ef44-4df1-84b2-9514f5c17991', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newOrder)
-    }).catch(err => console.log('Sync error:', err));
+    // Envoi automatique vers Google Sheets
+    envoyerCommandeVersSheet(newOrder);
     currentOrder = newOrder;
     
     // Clear cart
@@ -1714,6 +1841,8 @@ function adminLogout() {
 }
 
 function renderAdminDashboard() {
+    console.log('🔄 Admin ouvert - sync en cours...');
+    synchronisationAutomatique();
   if (!isAdminAuthenticated) {
     navigateToPage('admin-login');
     return;
